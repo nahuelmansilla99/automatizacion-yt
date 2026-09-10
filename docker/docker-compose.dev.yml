@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: yt-summary-postgres-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DATABASE_USER:-postgres}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-postgres123}
+      POSTGRES_DB: ${DATABASE_NAME:-yt_summaries_db}
+    ports:
+      - "${DATABASE_PORT:-5434}:5432"
+    volumes:
+      - yt_summary_postgres_data_dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER:-postgres} -d ${DATABASE_NAME:-yt_summaries_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  yt_summary_postgres_data_dev:
+    name: yt_summary_postgres_data_dev

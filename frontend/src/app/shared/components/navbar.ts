@@ -1,0 +1,58 @@
+import { Component, inject } from '@angular/core';
+import { SummariesStore } from '../../features/dashboard/store/summaries.store';
+
+@Component({
+  selector: 'app-navbar',
+  standalone: true,
+  template: `
+    <header class="border-b border-[var(--dark2)] bg-[var(--dark0-hard)] px-4 py-3 sm:px-8">
+      <div class="mx-auto flex max-w-7xl items-center justify-between">
+        <!-- Logo & Titulo -->
+        <div class="flex items-center gap-3">
+          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--dark1)] border border-[var(--dark2)] text-[var(--bright-orange)] shadow-md">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+            </svg>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-lg font-bold text-[var(--light0)] tracking-tight">
+                Obsidian YT Resúmenes
+              </h1>
+              <span class="rounded bg-[var(--dark1)] px-2 py-0.5 text-xs font-semibold text-[var(--bright-aqua)] border border-[var(--dark2)]">
+                v2.0
+              </span>
+            </div>
+            <p class="text-xs text-[var(--light3)]">
+              Extracción, transcripción y exportación a Obsidian Markdown
+            </p>
+          </div>
+        </div>
+
+        <!-- Indicador de conexión WebSocket & Dominio -->
+        <div class="flex items-center gap-3">
+          <div class="hidden sm:flex items-center gap-1.5 rounded-full bg-[var(--dark1)] px-3 py-1 text-xs text-[var(--light2)] border border-[var(--dark2)]">
+            <span class="text-[var(--bright-yellow)]">🌐</span>
+            <span>resumen.ncodem.com</span>
+          </div>
+
+          <div class="flex items-center gap-2 rounded-full bg-[var(--dark1)] px-3 py-1 text-xs font-medium border border-[var(--dark2)]">
+            @if (store.isWsConnected()) {
+              <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--bright-green)] opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-[var(--bright-green)]"></span>
+              </span>
+              <span class="text-[var(--bright-green)]">En vivo</span>
+            } @else {
+              <span class="inline-flex rounded-full h-2 w-2 bg-[var(--bright-red)]"></span>
+              <span class="text-[var(--bright-red)]">Desconectado</span>
+            }
+          </div>
+        </div>
+      </div>
+    </header>
+  `,
+})
+export class NavbarComponent {
+  readonly store = inject(SummariesStore);
+}

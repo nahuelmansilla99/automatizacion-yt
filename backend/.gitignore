@@ -1,0 +1,17 @@
+# Compiled output
+/dist
+/node_modules
+/coverage
+
+# Environment
+.env
+.env.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# IDE
+.idea/
+.vscode/
+*.swp

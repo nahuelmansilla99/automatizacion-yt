@@ -1,0 +1,210 @@
+@import "tailwindcss";
+
+:root {
+  /* Obsidian Gruvbox Palette */
+  --dark0-hard_x: 29, 32, 33; /* #1d2021 */
+  --dark0-hard: rgb(var(--dark0-hard_x));
+  --dark0_x: 40, 40, 40; /* #282828 */
+  --dark0: rgb(var(--dark0_x));
+  --dark0-soft_x: 50, 48, 47; /* #32302f */
+  --dark0-soft: rgb(var(--dark0-soft_x));
+  --dark1_x: 60, 56, 54; /* #3c3836 */
+  --dark1: rgb(var(--dark1_x));
+  --dark2_x: 80, 73, 69; /* #504945 */
+  --dark2: rgb(var(--dark2_x));
+  --dark3_x: 102, 92, 84; /* #665c54 */
+  --dark3: rgb(var(--dark3_x));
+  --dark4_x: 124, 111, 100; /* #7c6f64 */
+  --dark4: rgb(var(--dark4_x));
+  --gray_x: 146, 131, 116; /* #928374 */
+  --gray: rgb(var(--gray_x));
+
+  --light0-hard_x: 249, 245, 215; /* #f9f5d7 */
+  --light0-hard: rgb(var(--light0-hard_x));
+  --light0_x: 251, 241, 199; /* #fbf1c7 */
+  --light0: rgb(var(--light0_x));
+  --light1_x: 235, 219, 178; /* #ebdbb2 */
+  --light1: rgb(var(--light1_x));
+  --light2_x: 213, 196, 161; /* #d5c4a1 */
+  --light2: rgb(var(--light2_x));
+  --light3_x: 189, 174, 147; /* #bdae93 */
+  --light3: rgb(var(--light3_x));
+  --light4_x: 168, 153, 132; /* #a89984 */
+  --light4: rgb(var(--light4_x));
+
+  --bright-red_x: 251, 73, 52; /* #fb4934 */
+  --bright-red: rgb(var(--bright-red_x));
+  --bright-green_x: 184, 187, 38; /* #b8bb26 */
+  --bright-green: rgb(var(--bright-green_x));
+  --bright-yellow_x: 250, 189, 47; /* #fabd2f */
+  --bright-yellow: rgb(var(--bright-yellow_x));
+  --bright-blue_x: 131, 165, 152; /* #83a598 */
+  --bright-blue: rgb(var(--bright-blue_x));
+  --bright-purple_x: 211, 134, 155; /* #d3869b */
+  --bright-purple: rgb(var(--bright-purple_x));
+  --bright-aqua_x: 142, 192, 124; /* #8ec07c */
+  --bright-aqua: rgb(var(--bright-aqua_x));
+  --bright-orange_x: 254, 128, 25; /* #fe8019 */
+  --bright-orange: rgb(var(--bright-orange_x));
+
+  --neutral-red_x: 204, 36, 29; /* #cc241d */
+  --neutral-red: rgb(var(--neutral-red_x));
+  --neutral-green_x: 152, 151, 26; /* #98971a */
+  --neutral-green: rgb(var(--neutral-green_x));
+  --neutral-yellow_x: 215, 153, 33; /* #d79921 */
+  --neutral-yellow: rgb(var(--neutral-yellow_x));
+  --neutral-blue_x: 69, 133, 136; /* #458588 */
+  --neutral-blue: rgb(var(--neutral-blue_x));
+  --neutral-aqua_x: 104, 157, 106; /* #689d6a */
+  --neutral-aqua: rgb(var(--neutral-aqua_x));
+  --neutral-orange_x: 214, 93, 14; /* #d65d0e */
+  --neutral-orange: rgb(var(--neutral-orange_x));
+
+  /* Asignaciones del Tema Dark por defecto */
+  --bg-primary: var(--dark0);
+  --bg-primary-alt: var(--dark0-hard);
+  --bg-card: var(--dark1);
+  --bg-card-hover: var(--dark2);
+  --border-color: var(--dark2);
+
+  --text-main: var(--light0);
+  --text-muted: var(--light2);
+  --text-faint: var(--light3);
+
+  --accent-primary: var(--bright-orange);
+  --accent-aqua: var(--bright-aqua);
+  --accent-yellow: var(--bright-yellow);
+  --accent-green: var(--bright-green);
+  --accent-red: var(--bright-red);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-primary-alt);
+  color: var(--text-main);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  min-height: 100vh;
+}
+
+/* Scrollbar Gruvbox */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--dark0-hard);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--dark2);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--dark3);
+}
+
+/* Estilos de Renderizado Markdown para el Modal Obsidian Gruvbox */
+.markdown-body {
+  color: var(--text-main);
+  line-height: 1.6;
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4 {
+  color: var(--neutral-yellow);
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid var(--dark2);
+  padding-bottom: 0.3rem;
+}
+
+.markdown-body h1 {
+  color: var(--bright-orange);
+  font-size: 1.75rem;
+}
+
+.markdown-body h2 {
+  font-size: 1.4rem;
+}
+
+.markdown-body h3 {
+  font-size: 1.15rem;
+}
+
+.markdown-body p {
+  margin-top: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.markdown-body li {
+  margin-bottom: 0.35rem;
+}
+
+.markdown-body strong {
+  color: var(--light0-hard);
+  font-weight: 600;
+}
+
+.markdown-body em {
+  color: var(--light1);
+}
+
+.markdown-body a {
+  color: var(--bright-aqua);
+  text-decoration: none;
+}
+
+.markdown-body a:hover {
+  text-decoration: underline;
+}
+
+.markdown-body code {
+  background-color: var(--dark0-hard);
+  color: var(--bright-blue);
+  padding: 0.15rem 0.35rem;
+  border-radius: 4px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.9em;
+}
+
+.markdown-body pre {
+  background-color: var(--dark0-hard);
+  padding: 1rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  border: 1px solid var(--dark2);
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.markdown-body pre code {
+  background-color: transparent;
+  padding: 0;
+  color: var(--light1);
+}
+
+.markdown-body blockquote {
+  border-left: 4px solid var(--bright-aqua);
+  margin: 1rem 0;
+  padding-left: 1rem;
+  color: var(--text-muted);
+  background-color: rgba(var(--dark1_x), 0.4);
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  border-radius: 0 4px 4px 0;
+}
+
+.markdown-body hr {
+  border: 0;
+  border-top: 1px solid var(--dark2);
+  margin: 1.5rem 0;
+}

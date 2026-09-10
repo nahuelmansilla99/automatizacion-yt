@@ -1,0 +1,63 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: yt-summary-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DATABASE_USER:-yt_user}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-yt_secure_password_123}
+      POSTGRES_DB: ${DATABASE_NAME:-yt_summaries_db}
+    volumes:
+      - yt_summary_postgres_data:/var/lib/postgresql/data
+    networks:
+      - dokploy-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER:-yt_user} -d ${DATABASE_NAME:-yt_summaries_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: yt-summary-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_USER: ${DATABASE_USER:-yt_user}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-yt_secure_password_123}
+      DATABASE_NAME: ${DATABASE_NAME:-yt_summaries_db}
+      N8N_WEBHOOK_URL: ${N8N_WEBHOOK_URL}
+      WEBHOOK_SECRET: ${WEBHOOK_SECRET}
+      SUPADATA_API_KEY: ${SUPADATA_API_KEY}
+      FRONTEND_URL: ${FRONTEND_URL:-https://resumen.ncodem.com}
+    ports:
+      - "3000:3000"
+    networks:
+      - dokploy-network
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: yt-summary-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    networks:
+      - dokploy-network
+
+volumes:
+  yt_summary_postgres_data:
+    name: yt_summary_postgres_data
+
+networks:
+  dokploy-network:
+    external: true
