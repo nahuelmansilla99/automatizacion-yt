@@ -12,6 +12,6 @@ export const AppDataSource = new DataSource({
   password: process.env.DATABASE_PASSWORD || 'postgres123',
   database: process.env.DATABASE_NAME || 'yt_summaries_db',
   entities: [VideoSummary],
-  migrations: ['src/core/database/migrations/*.ts'],
+  migrations: [__dirname + '/migrations/*{.ts,.js}'],
   synchronize: false,
 });

@@ -24,7 +24,9 @@ export class SummariesGateway
   private readonly logger = new Logger(SummariesGateway.name);
 
   afterInit() {
-    this.logger.log('WebSocket Gateway initialized for real-time notifications');
+    this.logger.log(
+      'WebSocket Gateway initialized for real-time notifications',
+    );
   }
 
   handleConnection(client: Socket) {

@@ -18,9 +18,11 @@ describe('SummariesService', () => {
   beforeEach(async () => {
     mockRepo = {
       create: jest.fn().mockImplementation((dto) => dto),
-      save: jest.fn().mockImplementation((summary) =>
-        Promise.resolve({ id: 'mock-uuid-1234', ...summary }),
-      ),
+      save: jest
+        .fn()
+        .mockImplementation((summary) =>
+          Promise.resolve({ id: 'mock-uuid-1234', ...summary }),
+        ),
       findAndCount: jest.fn().mockResolvedValue([[], 0]),
       findOne: jest.fn().mockResolvedValue({
         id: 'mock-uuid-1234',

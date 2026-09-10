@@ -12,6 +12,10 @@ export const envValidationSchema = Joi.object({
   DATABASE_USER: Joi.string().required(),
   DATABASE_PASSWORD: Joi.string().required(),
   DATABASE_NAME: Joi.string().required(),
+  DATABASE_SYNCHRONIZE: Joi.boolean()
+    .truthy('true')
+    .falsy('false')
+    .default(false),
 
   N8N_WEBHOOK_URL: Joi.string().uri().allow('').optional(),
   WEBHOOK_SECRET: Joi.string().required(),

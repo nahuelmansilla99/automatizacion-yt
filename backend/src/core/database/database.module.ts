@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { VideoSummary } from '../../features/summaries/entities/video-summary.entity';
+import { migrations } from './migrations';
 
 @Module({
   imports: [
@@ -16,8 +17,11 @@ import { VideoSummary } from '../../features/summaries/entities/video-summary.en
         password: configService.get<string>('DATABASE_PASSWORD'),
         database: configService.get<string>('DATABASE_NAME'),
         entities: [VideoSummary],
-        // Cero synchronize en producción: se usan migraciones versionadas
-        synchronize: configService.get<string>('NODE_ENV') !== 'production',
+        migrations,
+        migrationsRun: true,
+        // Cero synchronize en producción: se ejecutan migraciones versionadas automáticamente
+        synchronize:
+          configService.get<boolean>('DATABASE_SYNCHRONIZE') ?? false,
         logging: configService.get<string>('NODE_ENV') === 'development',
       }),
     }),

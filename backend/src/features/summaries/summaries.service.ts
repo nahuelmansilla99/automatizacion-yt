@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, ILike } from 'typeorm';
 import { HttpService } from '@nestjs/axios';
@@ -136,7 +132,9 @@ export class SummariesService {
           },
         ),
       );
-      this.logger.log(`Webhook despachado exitosamente a n8n para el ID: ${id}`);
+      this.logger.log(
+        `Webhook despachado exitosamente a n8n para el ID: ${id}`,
+      );
     } catch (error: any) {
       const errorMsg =
         error.response?.data?.message ||

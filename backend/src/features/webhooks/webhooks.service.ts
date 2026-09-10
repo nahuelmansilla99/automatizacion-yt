@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import {
@@ -29,15 +25,21 @@ export class WebhooksService {
     });
 
     if (!summary) {
-      this.logger.error(`Resumen no encontrado para el webhook de éxito: ${dto.id}`);
+      this.logger.error(
+        `Resumen no encontrado para el webhook de éxito: ${dto.id}`,
+      );
       throw new NotFoundException(`Resumen con ID ${dto.id} no encontrado`);
     }
 
     // Mapeo flexible de campos
     const resolvedTitle = dto.videoTitle || dto.title || summary.videoTitle;
-    const resolvedChannel = dto.channelName || dto.channel || summary.channelName;
+    const resolvedChannel =
+      dto.channelName || dto.channel || summary.channelName;
     const resolvedMarkdown =
-      dto.markdownContent || dto.markdown || dto.text || summary.markdownContent;
+      dto.markdownContent ||
+      dto.markdown ||
+      dto.text ||
+      summary.markdownContent;
 
     summary.videoTitle = resolvedTitle;
     summary.channelName = resolvedChannel;
@@ -59,7 +61,9 @@ export class WebhooksService {
     });
 
     if (!summary) {
-      this.logger.error(`Resumen no encontrado para el webhook de error: ${dto.id}`);
+      this.logger.error(
+        `Resumen no encontrado para el webhook de error: ${dto.id}`,
+      );
       throw new NotFoundException(`Resumen con ID ${dto.id} no encontrado`);
     }
 
@@ -71,7 +75,9 @@ export class WebhooksService {
     summary.errorMessage = `${resolvedError}${nodeInfo}`;
 
     const saved = await this.summariesRepository.save(summary);
-    this.logger.warn(`Resumen marcado con error para ID: ${saved.id} - ${saved.errorMessage}`);
+    this.logger.warn(
+      `Resumen marcado con error para ID: ${saved.id} - ${saved.errorMessage}`,
+    );
 
     this.gateway.notifySummaryError(saved);
 
