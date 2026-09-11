@@ -9,13 +9,8 @@ Usar el decorator `@Component` para definir la metadata del componente.
 ```ts
 @Component({
   selector: 'app-perfil',
-  template: `
-    <img src="perfil.jpg" alt="Foto de perfil" />
-    <button (click)="guardar()">Guardar</button>
-  `,
-  styles: `
-    img { border-radius: 50%; }
-  `,
+  templateUrl: './perfil.html',
+  styleUrl: './perfil.css',
 })
 export class Perfil {
   guardar() { /* ... */ }
@@ -25,11 +20,10 @@ export class Perfil {
 ## Opciones de Metadata
 
 - `selector`: El selector CSS que identifica este componente en templates.
-- `template`: Template HTML inline (preferido para templates pequeños).
-- `templateUrl`: Path a un archivo HTML externo.
-- `styles`: Estilos CSS inline.
-- `styleUrl` / `styleUrls`: Path(s) a archivo(s) CSS externo(s).
+- `templateUrl`: Path al archivo HTML externo (**Obligatorio**: cada componente debe tener su propio archivo `.html`).
+- `styleUrl`: Path al archivo CSS externo (**Obligatorio**: cada componente debe tener su propio archivo `.css`).
 - `imports`: Lista los componentes, directivas o pipes usados en el template de este componente.
+- `template` / `styles`: **Evitar / No usar**. No se permiten templates ni estilos inline embebidos en el archivo `.ts`.
 
 ## Usar Componentes
 
@@ -200,3 +194,4 @@ Angular encapsula los estilos de cada componente por defecto (ViewEncapsulation.
 4. **Self-closing tags** siempre que no haya contenido proyectado
 5. **`track`** obligatorio en `@for` para performance
 6. **Importar** explícitamente las dependencias en `imports`
+7. **Separación de archivos obligatoria**: Cada componente debe tener sus archivos `.ts`, `.html` y `.css` en su respectiva carpeta. No incluir HTML ni CSS embebido/inline dentro del `.ts`.
