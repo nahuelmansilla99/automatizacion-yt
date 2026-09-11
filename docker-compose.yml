@@ -41,7 +41,7 @@ services:
       WEBHOOK_SECRET: ${WEBHOOK_SECRET:-mi_super_secreto_webhook_12345}
       SUPADATA_API_KEY: ${SUPADATA_API_KEY:-}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
-      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-1.5-flash}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-3.6-flash}
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:8080}
     ports:
       - "3000:3000"

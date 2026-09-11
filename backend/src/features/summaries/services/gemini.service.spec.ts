@@ -119,7 +119,7 @@ NestJS organiza la aplicación en módulos que encapsulan controladores y provee
 
       expect(mockGenerateContent).toHaveBeenCalledWith(
         expect.objectContaining({
-          model: 'gemini-1.5-flash',
+          model: 'gemini-3.6-flash',
         }),
       );
     });

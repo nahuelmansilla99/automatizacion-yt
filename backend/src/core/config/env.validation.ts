@@ -24,5 +24,5 @@ export const envValidationSchema = Joi.object({
   SUPADATA_API_KEY: Joi.string().allow('').optional(),
 
   GEMINI_API_KEY: Joi.string().allow('').optional(),
-  GEMINI_MODEL: Joi.string().default('gemini-1.5-flash'),
+  GEMINI_MODEL: Joi.string().default('gemini-3.6-flash'),
 });

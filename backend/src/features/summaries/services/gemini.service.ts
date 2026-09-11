@@ -34,7 +34,7 @@ export class GeminiService {
   constructor(private readonly configService: ConfigService) {
     this.apiKey = this.configService.get<string>('GEMINI_API_KEY');
     this.modelName =
-      this.configService.get<string>('GEMINI_MODEL') || 'gemini-1.5-flash';
+      this.configService.get<string>('GEMINI_MODEL') || 'gemini-3.6-flash';
 
     if (!this.apiKey) {
       this.logger.warn(
@@ -64,57 +64,77 @@ export class GeminiService {
 **Transcripción:**
 ${transcript}`;
 
-    try {
-      const response = await this.ai.models.generateContent({
-        model: this.modelName,
-        contents: promptContent,
-        config: {
-          systemInstruction: GEMINI_SYSTEM_INSTRUCTION,
-        },
-      });
+    const maxRetries = 3;
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const response = await this.ai.models.generateContent({
+          model: this.modelName,
+          contents: promptContent,
+          config: {
+            systemInstruction: GEMINI_SYSTEM_INSTRUCTION,
+          },
+        });
 
-      const markdown = response.text;
+        const markdown = response.text;
 
-      if (!markdown || markdown.trim().length === 0) {
-        const emptyErrorMsg =
-          'El modelo de Gemini retornó una respuesta vacía.';
-        this.logger.error(emptyErrorMsg);
-        throw new Error(emptyErrorMsg);
+        if (!markdown || markdown.trim().length === 0) {
+          const emptyErrorMsg =
+            'El modelo de Gemini retornó una respuesta vacía.';
+          this.logger.error(emptyErrorMsg);
+          throw new Error(emptyErrorMsg);
+        }
+
+        return markdown;
+      } catch (error: any) {
+        if (
+          error instanceof Error &&
+          error.message === 'El modelo de Gemini retornó una respuesta vacía.'
+        ) {
+          throw error;
+        }
+
+        const rawMessage =
+          error instanceof Error ? error.message : String(error);
+        const lower = rawMessage.toLowerCase();
+        const isUnavailable =
+          lower.includes('503') ||
+          lower.includes('high demand') ||
+          lower.includes('unavailable');
+
+        if (isUnavailable && attempt < maxRetries) {
+          this.logger.warn(
+            `Gemini reportó alta demanda temporal (intento ${attempt}/${maxRetries}). Reintentando en 2 segundos...`,
+          );
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+          continue;
+        }
+
+        let prefix = 'Error en la generación de resumen con Gemini';
+        if (
+          lower.includes('429') ||
+          lower.includes('quota') ||
+          lower.includes('resource_exhausted')
+        ) {
+          prefix = 'Cuota excedida o límite de peticiones (429) en Gemini';
+        } else if (
+          lower.includes('api_key_invalid') ||
+          lower.includes('invalid api key') ||
+          lower.includes('api key not valid')
+        ) {
+          prefix = 'Clave de API de Gemini inválida';
+        } else if (isUnavailable) {
+          prefix = 'Servicio de Gemini temporalmente no disponible (503)';
+        }
+
+        const formattedError = `${prefix}: ${rawMessage}`;
+        this.logger.error(
+          formattedError,
+          error instanceof Error ? error.stack : undefined,
+        );
+        throw new Error(formattedError);
       }
-
-      return markdown;
-    } catch (error: any) {
-      if (
-        error instanceof Error &&
-        error.message === 'El modelo de Gemini retornó una respuesta vacía.'
-      ) {
-        throw error;
-      }
-
-      const rawMessage = error instanceof Error ? error.message : String(error);
-      const lower = rawMessage.toLowerCase();
-
-      let prefix = 'Error en la generación de resumen con Gemini';
-      if (
-        lower.includes('429') ||
-        lower.includes('quota') ||
-        lower.includes('resource_exhausted')
-      ) {
-        prefix = 'Cuota excedida o límite de peticiones (429) en Gemini';
-      } else if (
-        lower.includes('api_key_invalid') ||
-        lower.includes('invalid api key') ||
-        lower.includes('api key not valid')
-      ) {
-        prefix = 'Clave de API de Gemini inválida';
-      }
-
-      const formattedError = `${prefix}: ${rawMessage}`;
-      this.logger.error(
-        formattedError,
-        error instanceof Error ? error.stack : undefined,
-      );
-      throw new Error(formattedError);
     }
+
+    throw new Error('Error inesperado al contactar Gemini.');
   }
 }
