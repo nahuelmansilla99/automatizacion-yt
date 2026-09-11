@@ -1,97 +1,65 @@
-# Guía de Adaptación del Flujo Existente de n8n en Dokploy
+# Guía de Configuración de n8n: Micro-Worker de Google Drive (v3)
 
-Esta guía explica paso a paso los únicos cambios necesarios para conectar tu flujo existente de n8n en Dokploy con la nueva plataforma de resúmenes.
+En la nueva arquitectura, **NestJS realiza todo el procesamiento crítico de forma nativa** (obtención de metadata vía YouTube oEmbed, extracción de transcripción vía Supadata y generación de resumen inteligente vía Google Gemini).
+
+n8n se utiliza **exclusivamente como un micro-conector opcional para subir el archivo `.md` a Google Drive (Obsidian)** en modo *Fire & Forget*, aprovechando la autenticación visual OAuth de Google sin bloquear a la aplicación web.
 
 ---
 
-## 1. Nodo Inicial: Webhook Trigger
+## 1. El Flujo en n8n: Solo 2 Nodos
 
-En tu flujo de n8n, reemplaza cualquier trigger manual o de prueba por un nodo **Webhook**:
+El flujo ya no necesita llamar a Supadata, Gemini ni devolver webhooks de éxito o error a NestJS. Consta únicamente de dos nodos:
 
-1. **Crear o editar nodo "Webhook"**:
+```
+[ Webhook Trigger ]  ──>  [ Google Drive: Upload File ]
+```
+
+---
+
+## 2. Configuración Paso a Paso
+
+### Paso 1: Nodo "Webhook" (Trigger)
+1. Crea un nuevo Workflow en n8n llamado `Google Drive - Obsidian Sync`.
+2. Agrega el nodo **Webhook**:
    * **HTTP Method:** `POST`
-   * **Path:** `youtube-summary`
-   * **Authentication:** None (la seguridad la manejamos con el header `X-Webhook-Secret`)
-   * **Respond:** `Immediately` con código `200 OK`
-2. **Obtener la URL**:
-   * En Dokploy, si n8n comparte la red `dokploy-network` con el backend, NestJS lo llamará directamente como:
-     `http://n8n:5678/webhook/youtube-summary`
-   * Si prefieres usar la URL con dominio de n8n, usa:
-     `https://tu-n8n.ncodem.com/webhook/youtube-summary`
-   * Coloca esa URL en el archivo `.env` del backend en la variable:
-     `N8N_WEBHOOK_URL`
-
-3. **Datos de entrada recibidos en n8n:**
-   Al dispararse el flujo, el nodo Webhook tendrá disponible:
-   * `{{ $json.body.id }}`: UUID del registro en PostgreSQL.
-   * `{{ $json.body.youtubeUrl }}`: URL del video enviada desde Angular.
-
----
-
-## 2. Ajuste de los Nodos Intermedios
-
-* **Supadata Metadata / Transcript:**
-  * En el parámetro de URL o ID del video, pasa `{{ $('Webhook').first().json.body.youtubeUrl }}`.
-* **LLM Chain (Gemini):**
-  * Sigue procesando el texto del transcript como lo tienes configurado.
-* **Google Drive Upload:**
-  * Sigue subiendo el `.md` a tu carpeta de Obsidian en Drive.
-
----
-
-## 3. Nodo Final de Éxito: HTTP Request
-
-Al final de tu flujo principal (después de subir el archivo a Google Drive):
-
-1. Agrega un nodo **HTTP Request**:
-   * **Method:** `POST`
-   * **URL:**
-     * Si están en la misma red de Dokploy: `http://backend:3000/api/webhooks/n8n-success`
-     * O por dominio público: `https://resumen.ncodem.com/api/webhooks/n8n-success`
-   * **Send Headers:** Activado
-     * Header 1: `Content-Type` = `application/json`
-     * Header 2: `X-Webhook-Secret` = `{{ $env.WEBHOOK_SECRET || 'mi_super_secreto_webhook_12345' }}` (el mismo secreto configurado en el `.env` de NestJS)
-   * **Send Body:** Activado (JSON)
-     ```json
-     {
-       "id": "{{ $('Webhook').first().json.body.id }}",
-       "videoTitle": "{{ $('Supadata Metadata').first().json.title }}",
-       "channelName": "{{ $('Supadata Metadata').first().json.channel }}",
-       "markdownContent": "{{ $('Gemini').first().json.text }}"
-     }
+   * **Path:** `drive-sync`
+   * **Authentication:** None (la seguridad se valida por cabecera).
+   * **Respond:** `Immediately` con código `200 OK`.
+3. **URL del Webhook:**
+   * En Dokploy (red interna): `http://n8n:5678/webhook/drive-sync`
+   * O dominio público: `https://n8n.ncodem.com/webhook/drive-sync`
+   * Configura esa URL en el `.env` de NestJS en:
+     ```env
+     N8N_DRIVE_WEBHOOK_URL=http://n8n:5678/webhook/drive-sync
      ```
-   *(Adapta los nombres entre corchetes `$('')` a los nombres exactos de tus nodos en n8n)*.
+4. **Datos que recibe el Webhook desde NestJS:**
+   ```json
+   {
+     "id": "uuid-del-resumen",
+     "videoTitle": "Título del video",
+     "channelName": "Nombre del canal",
+     "markdownContent": "# Contenido del resumen en Markdown...",
+     "youtubeUrl": "https://www.youtube.com/watch?v=..."
+   }
+   ```
 
 ---
 
-## 4. Flujo Secundario de Error: Error Trigger
-
-Para auditar y mostrar en Angular exactamente qué falló si ocurre un error en cualquier nodo:
-
-1. Crea un workflow nuevo en n8n llamado `YouTube Summary - Error Handler`.
-2. Agrega el nodo **Error Trigger**:
-   * Este nodo se activa automáticamente cuando cualquier workflow asociado lanza un error no capturado.
-3. Conéctalo a un nodo **HTTP Request**:
-   * **Method:** `POST`
-   * **URL:** `http://backend:3000/api/webhooks/n8n-error` (o `https://resumen.ncodem.com/api/webhooks/n8n-error`)
-   * **Headers:**
-     * `Content-Type`: `application/json`
-     * `X-Webhook-Secret`: `<tu_secreto_configurado>`
-   * **Body (JSON):**
-     ```json
-     {
-       "id": "{{ $json.execution.error.id || $('Webhook').first().json.body.id }}",
-       "errorMessage": "{{ $json.execution.error.message }}",
-       "failedNode": "{{ $json.execution.lastNodeExecuted }}"
-     }
-     ```
-4. En el workflow principal, ve a **Settings** (ícono de engranaje) y en **Error Workflow** selecciona `YouTube Summary - Error Handler`.
+### Paso 2: Nodo "Google Drive" (Subir archivo)
+1. Conecta la salida del nodo Webhook a un nodo **Google Drive**:
+   * **Resource:** `File`
+   * **Operation:** `Upload`
+   * **Credential:** Tu cuenta de Google Drive conectada.
+   * **File Name:** `{{ $json.body.videoTitle.replace(/[/\\?%*:|"<>]/g, '-') }}.md`
+   * **Binary Data:** Desactivado (o subir contenido como texto directo).
+   * **File Content:** `{{ $json.body.markdownContent }}`
+   * **Folder:** Selecciona tu carpeta de Obsidian en Google Drive.
 
 ---
 
-## 5. ¡Listo!
-Con estos nodos configurados:
-1. Angular enviará la URL.
-2. NestJS la guardará y despertará a n8n.
-3. n8n completará el resumen, lo subirá a Google Drive y avisará a NestJS.
-4. NestJS actualizará la base de datos y notificará en vivo al frontend mediante WebSockets.
+## 3. Ventajas de este Enfoque
+
+1. **Cero Dependencia:** Si n8n está apagado o Google Drive demora, el usuario en la aplicación web ya tiene su resumen guardado en la base de datos y visible en pantalla.
+2. **Cero Ping-Pong de Webhooks:** n8n ya no necesita avisarle nada a NestJS.
+3. **Sin flujos de error complejos:** Ya no se requiere configurar Error Trigger Workflows en n8n, ya que todo el manejo de errores del procesamiento reside de forma segura en NestJS.
+
