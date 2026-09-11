@@ -149,9 +149,9 @@ test('debería procesar una URL de YouTube', async ({ page }) => {
 
 | Qué | Tipo de Test | Prioridad |
 |-----|-------------|----------|
+| Componentes y Features | Unit test (`.spec.ts` en la carpeta) | 🔴 Alta (Obligatorio) |
 | Services (API clients) | Unit test con HttpTestingController | 🔴 Alta |
 | Stores (estado con signals) | Unit test | 🔴 Alta |
-| Componentes con lógica | Unit test con Component Harnesses | 🟡 Media |
 | Guards de autenticación | Unit test con Router Testing | 🟡 Media |
 | Flujo completo (URL → resumen) | E2E con Playwright | 🟡 Media |
 | Pipes personalizadas | Unit test simple | 🟢 Baja |
@@ -164,3 +164,4 @@ test('debería procesar una URL de YouTube', async ({ page }) => {
 4. **Usar `describe` para agrupar** tests por funcionalidad
 5. **Nombrar tests en español con `debería...`** para legibilidad
 6. **`afterEach(() => httpMock.verify())`** para detectar requests no esperados
+7. **Archivo de test obligatorio por componente/feature**: Cada componente o feature nuevo DEBE crearse con su archivo de test `[nombre].spec.ts` en su respectiva carpeta junto al `.ts`, `.html` y `.css`.
