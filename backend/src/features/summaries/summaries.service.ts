@@ -1,13 +1,13 @@
 import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, ILike } from 'typeorm';
-import { HttpService } from '@nestjs/axios';
-import { ConfigService } from '@nestjs/config';
-import { firstValueFrom } from 'rxjs';
 import { VideoSummary, SummaryStatus } from './entities/video-summary.entity';
 import { CreateSummaryDto } from './dto/create-summary.dto';
 import { QuerySummariesDto } from './dto/query-summaries.dto';
 import { SummariesGateway } from '../notifications/summaries.gateway';
+import { TranscriptionService } from './services/transcription.service';
+import { GeminiService } from './services/gemini.service';
+import { DriveSyncService } from './services/drive-sync.service';
 
 @Injectable()
 export class SummariesService {
@@ -16,9 +16,10 @@ export class SummariesService {
   constructor(
     @InjectRepository(VideoSummary)
     private readonly summariesRepository: Repository<VideoSummary>,
-    private readonly httpService: HttpService,
-    private readonly configService: ConfigService,
     private readonly gateway: SummariesGateway,
+    private readonly transcriptionService: TranscriptionService,
+    private readonly geminiService: GeminiService,
+    private readonly driveSyncService: DriveSyncService,
   ) {}
 
   async create(createSummaryDto: CreateSummaryDto): Promise<VideoSummary> {
@@ -30,11 +31,13 @@ export class SummariesService {
     const savedSummary = await this.summariesRepository.save(summary);
     this.gateway.notifySummaryCreated(savedSummary);
 
-    // Disparar procesamiento en n8n de manera asíncrona sin bloquear la respuesta HTTP
-    this.dispatchToN8n(savedSummary.id, savedSummary.youtubeUrl).catch(
-      (error) => {
+    // Disparar procesamiento nativo en segundo plano sin bloquear la respuesta HTTP
+    this.executePipeline(savedSummary.id, savedSummary.youtubeUrl).catch(
+      (error: unknown) => {
+        const err = error instanceof Error ? error : new Error(String(error));
         this.logger.error(
-          `Error al despachar a n8n para el video ${savedSummary.id}: ${error.message}`,
+          `Error no capturado en pipeline para el video ${savedSummary.id}: ${err.message}`,
+          err.stack,
         );
       },
     );
@@ -90,11 +93,15 @@ export class SummariesService {
 
     this.gateway.notifySummaryUpdated(updated);
 
-    this.dispatchToN8n(updated.id, updated.youtubeUrl).catch((error) => {
-      this.logger.error(
-        `Error al reintentar n8n para el video ${updated.id}: ${error.message}`,
-      );
-    });
+    this.executePipeline(updated.id, updated.youtubeUrl).catch(
+      (error: unknown) => {
+        const err = error instanceof Error ? error : new Error(String(error));
+        this.logger.error(
+          `Error no capturado en reintento para el video ${updated.id}: ${err.message}`,
+          err.stack,
+        );
+      },
+    );
 
     return updated;
   }
@@ -106,47 +113,92 @@ export class SummariesService {
     return { deleted: true };
   }
 
-  async dispatchToN8n(id: string, youtubeUrl: string): Promise<void> {
-    const n8nWebhookUrl = this.configService.get<string>('N8N_WEBHOOK_URL');
-    const webhookSecret = this.configService.get<string>('WEBHOOK_SECRET');
-
-    if (!n8nWebhookUrl) {
-      this.logger.warn(
-        'N8N_WEBHOOK_URL no configurada. El registro permanece en PENDING para prueba manual.',
-      );
-      return;
-    }
+  async executePipeline(id: string, youtubeUrl: string): Promise<void> {
+    this.logger.log(
+      `Iniciando procesamiento nativo para ID: ${id} (${youtubeUrl})`,
+    );
 
     try {
-      this.logger.log(`Enviando webhook a n8n: ${n8nWebhookUrl} (ID: ${id})`);
-      await firstValueFrom(
-        this.httpService.post(
-          n8nWebhookUrl,
-          { id, youtubeUrl },
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              'X-Webhook-Secret': webhookSecret,
-            },
-            timeout: 10000,
-          },
-        ),
-      );
-      this.logger.log(
-        `Webhook despachado exitosamente a n8n para el ID: ${id}`,
-      );
-    } catch (error: any) {
-      const errorMsg =
-        error.response?.data?.message ||
-        error.message ||
-        'Fallo de conexión con n8n';
-      this.logger.error(`Error al conectar con n8n: ${errorMsg}`);
+      // 1. Obtener metadata y transcripción
+      const { videoTitle, channelName, transcript } =
+        await this.transcriptionService.fetchVideoData(youtubeUrl);
 
-      // Actualizar a ERROR si n8n no está disponible
+      // Actualizar metadata temprana en la base de datos
+      await this.summariesRepository.update(id, {
+        videoTitle,
+        channelName,
+      });
+
+      // 2. Generar resumen estructurado con Gemini
+      const markdownContent = await this.geminiService.generateSummary(
+        videoTitle,
+        channelName,
+        transcript,
+      );
+
+      // 3. Persistir resultado exitoso
       const summary = await this.summariesRepository.findOne({ where: { id } });
-      if (summary && summary.status === SummaryStatus.PENDING) {
+      if (!summary) {
+        this.logger.warn(
+          `Resumen con ID ${id} ya no existe tras completar el pipeline.`,
+        );
+        return;
+      }
+
+      summary.videoTitle = videoTitle;
+      summary.channelName = channelName;
+      summary.markdownContent = markdownContent;
+      summary.status = SummaryStatus.SUCCESS;
+      summary.errorMessage = null;
+
+      const saved = await this.summariesRepository.save(summary);
+      this.logger.log(`Resumen completado exitosamente para ID: ${id}`);
+      this.gateway.notifySummaryUpdated(saved);
+
+      // 4. Sincronización secundaria a Google Drive vía n8n (Fire & Forget, no bloquea al usuario)
+      this.driveSyncService
+        .syncToDrive({
+          id,
+          videoTitle,
+          channelName,
+          markdownContent,
+          youtubeUrl,
+        })
+        .catch((err: unknown) => {
+          const error = err instanceof Error ? err : new Error(String(err));
+          this.logger.warn(
+            `Fallo inesperado al sincronizar con Drive para ${id}: ${error.message}`,
+          );
+        });
+    } catch (error: unknown) {
+      let errorMsg = 'Error desconocido al procesar el resumen';
+      let stack: string | undefined;
+
+      if (error instanceof Error) {
+        errorMsg = error.message;
+        stack = error.stack;
+      } else if (typeof error === 'object' && error !== null) {
+        const errorObj = error as {
+          response?: { data?: { message?: string } };
+          message?: string;
+          stack?: string;
+        };
+        errorMsg =
+          errorObj.response?.data?.message ||
+          errorObj.message ||
+          errorMsg;
+        stack = errorObj.stack;
+      }
+
+      this.logger.error(
+        `Error al procesar el pipeline para el resumen ${id}: ${errorMsg}`,
+        stack,
+      );
+
+      const summary = await this.summariesRepository.findOne({ where: { id } });
+      if (summary) {
         summary.status = SummaryStatus.ERROR;
-        summary.errorMessage = `Error al contactar n8n: ${errorMsg}`;
+        summary.errorMessage = errorMsg;
         const updated = await this.summariesRepository.save(summary);
         this.gateway.notifySummaryError(updated);
       }
