@@ -35,8 +35,11 @@ services:
       DATABASE_PASSWORD: ${DATABASE_PASSWORD:-postgres123}
       DATABASE_NAME: ${DATABASE_NAME:-yt_summaries_db}
       N8N_WEBHOOK_URL: ${N8N_WEBHOOK_URL:-}
+      N8N_DRIVE_WEBHOOK_URL: ${N8N_DRIVE_WEBHOOK_URL:-}
       WEBHOOK_SECRET: ${WEBHOOK_SECRET:-mi_super_secreto_webhook_12345}
       SUPADATA_API_KEY: ${SUPADATA_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-1.5-flash}
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:8080}
     ports:
       - "3000:3000"
