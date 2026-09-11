@@ -6,6 +6,10 @@ import { SummariesService } from './summaries.service';
 import { SummariesController } from './summaries.controller';
 import { NotificationsModule } from '../notifications/notifications.module';
 
+import { TranscriptionService } from './services/transcription.service';
+import { DriveSyncService } from './services/drive-sync.service';
+import { GeminiService } from './services/gemini.service';
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([VideoSummary]),
@@ -13,7 +17,18 @@ import { NotificationsModule } from '../notifications/notifications.module';
     NotificationsModule,
   ],
   controllers: [SummariesController],
-  providers: [SummariesService],
-  exports: [SummariesService, TypeOrmModule],
+  providers: [
+    SummariesService,
+    TranscriptionService,
+    DriveSyncService,
+    GeminiService,
+  ],
+  exports: [
+    SummariesService,
+    TranscriptionService,
+    DriveSyncService,
+    GeminiService,
+    TypeOrmModule,
+  ],
 })
 export class SummariesModule {}
