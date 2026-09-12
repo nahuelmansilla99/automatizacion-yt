@@ -2,11 +2,12 @@ import { Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
+import { SummariesGateway } from '../../notifications/summaries.gateway';
 
 export interface DriveSyncPayload {
   id: string;
   videoTitle: string;
-  channelName?: string;
+  channelName?: string | null;
   markdownContent: string;
   youtubeUrl: string;
 }
@@ -18,15 +19,10 @@ export class DriveSyncService {
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
+    private readonly gateway: SummariesGateway,
   ) {}
 
-  async syncToDrive(payload: {
-    id: string;
-    videoTitle: string;
-    channelName?: string;
-    markdownContent: string;
-    youtubeUrl: string;
-  }): Promise<boolean> {
+  async syncToDrive(payload: DriveSyncPayload): Promise<boolean> {
     const n8nDriveWebhookUrl = this.configService.get<string>(
       'N8N_DRIVE_WEBHOOK_URL',
     );
@@ -40,7 +36,7 @@ export class DriveSyncService {
     }
 
     try {
-      await firstValueFrom(
+      const response = await firstValueFrom(
         this.httpService.post(
           n8nDriveWebhookUrl,
           {
@@ -55,14 +51,27 @@ export class DriveSyncService {
               'Content-Type': 'application/json',
               'X-Webhook-Secret': webhookSecret,
             },
-            timeout: 10000,
+            timeout: 25000,
           },
         ),
       );
 
+      const resData = response.data;
+      const fileName = resData?.driveFileName || payload.videoTitle;
+      const fileId = resData?.driveFileId;
+      const driveUrl = resData?.driveUrl;
+
       this.logger.log(
-        'Sincronización a Google Drive disparada exitosamente hacia n8n',
+        `Sincronización a Google Drive completada exitosamente hacia n8n para ID: ${payload.id}`,
       );
+
+      this.gateway.notifyDriveSynced({
+        id: payload.id,
+        driveFileName: fileName,
+        driveFileId: fileId,
+        driveUrl: driveUrl,
+      });
+
       return true;
     } catch (error: unknown) {
       const errorMessage =

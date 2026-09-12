@@ -5,11 +5,13 @@ import { ConfigService } from '@nestjs/config';
 import { Logger } from '@nestjs/common';
 import { of, throwError } from 'rxjs';
 import { DriveSyncService, DriveSyncPayload } from './drive-sync.service';
+import { SummariesGateway } from '../../notifications/summaries.gateway';
 
 describe('DriveSyncService', () => {
   let service: DriveSyncService;
   let mockHttpService: { post: ReturnType<typeof vi.fn> };
   let mockConfigService: { get: ReturnType<typeof vi.fn> };
+  let mockGateway: { notifyDriveSynced: ReturnType<typeof vi.fn> };
 
   beforeEach(async () => {
     mockHttpService = {
@@ -18,6 +20,10 @@ describe('DriveSyncService', () => {
 
     mockConfigService = {
       get: vi.fn(),
+    };
+
+    mockGateway = {
+      notifyDriveSynced: vi.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -30,6 +36,10 @@ describe('DriveSyncService', () => {
         {
           provide: ConfigService,
           useValue: mockConfigService,
+        },
+        {
+          provide: SummariesGateway,
+          useValue: mockGateway,
         },
       ],
     }).compile();
@@ -121,12 +131,18 @@ describe('DriveSyncService', () => {
             'Content-Type': 'application/json',
             'X-Webhook-Secret': webhookSecret,
           },
-          timeout: 10000,
+          timeout: 25000,
         },
       );
       expect(logSpy).toHaveBeenCalledWith(
-        'Sincronización a Google Drive disparada exitosamente hacia n8n',
+        `Sincronización a Google Drive completada exitosamente hacia n8n para ID: ${samplePayload.id}`,
       );
+      expect(mockGateway.notifyDriveSynced).toHaveBeenCalledWith({
+        id: samplePayload.id,
+        driveFileName: samplePayload.videoTitle,
+        driveFileId: undefined,
+        driveUrl: undefined,
+      });
     });
 
     it('should fallback channelName to "YouTube" if not provided in payload', async () => {

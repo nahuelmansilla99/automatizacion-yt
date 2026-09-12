@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SummariesService } from './summaries.service';
 import { SummaryStatus } from './entities/video-summary.entity';
@@ -200,5 +201,58 @@ describe('SummariesService', () => {
     expect(mockGateway.notifySummaryDeleted).toHaveBeenCalledWith(
       'mock-uuid-1234',
     );
+  });
+
+  describe('syncSummaryToDrive', () => {
+    it('should throw BadRequestException if summary has no markdownContent', async () => {
+      mockRepo.findOne.mockResolvedValueOnce({
+        id: 'mock-uuid-1234',
+        videoTitle: 'Test Video',
+        markdownContent: null,
+      });
+
+      await expect(
+        service.syncSummaryToDrive('mock-uuid-1234'),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should call driveSyncService.syncToDrive and return success when sync succeeds', async () => {
+      mockRepo.findOne.mockResolvedValueOnce({
+        id: 'mock-uuid-1234',
+        videoTitle: 'Video de Prueba',
+        channelName: 'Canal Dev',
+        markdownContent: '# Resumen válido',
+        youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      });
+      mockDriveSyncService.syncToDrive.mockResolvedValueOnce(true);
+
+      const result = await service.syncSummaryToDrive('mock-uuid-1234');
+
+      expect(mockDriveSyncService.syncToDrive).toHaveBeenCalledWith({
+        id: 'mock-uuid-1234',
+        videoTitle: 'Video de Prueba',
+        channelName: 'Canal Dev',
+        markdownContent: '# Resumen válido',
+        youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      });
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('exitosamente');
+    });
+
+    it('should return success false and descriptive message when driveSyncService fails', async () => {
+      mockRepo.findOne.mockResolvedValueOnce({
+        id: 'mock-uuid-1234',
+        videoTitle: 'Video de Prueba',
+        channelName: 'Canal Dev',
+        markdownContent: '# Resumen válido',
+        youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      });
+      mockDriveSyncService.syncToDrive.mockResolvedValueOnce(false);
+
+      const result = await service.syncSummaryToDrive('mock-uuid-1234');
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('No se pudo sincronizar');
+    });
   });
 });

@@ -84,3 +84,30 @@ Si algún nodo en n8n falla (ej. timeout en Supadata, error en la IA de Gemini, 
 > El backend acepta indistintamente:
 > * `errorMessage` o `message`
 > * `failedNode` (opcional, para identificar en qué paso ocurrió el fallo)
+
+---
+
+## 4. Confirmación de Subida a Drive: n8n ➔ NestJS (Vía Respuesta Síncrona Segura)
+
+Para maximizar la seguridad y no exponer **ningún** endpoint de entrada adicional en NestJS ni lidiar con túneles o Cloudflare Zero Trust OTP, n8n utiliza el nodo **Respond to Webhook** al final del flujo.
+
+NestJS inicia la conexión saliente hacia n8n (`POST /drive-sync`) y n8n responde en esa misma conexión HTTP una vez que Google Drive completó la subida.
+
+* **Nodo en n8n:** `Respond to Webhook` (`n8n-nodes-base.respondToWebhook`)
+* **Código de respuesta:** `200 OK`
+* **JSON devuelto a NestJS:**
+  ```json
+  {
+    "success": true,
+    "id": "c3a9f2a4-5678-4a1b-9f0e-123456789abc",
+    "driveFileId": "1AbCdEfGhIjKlMnOpQrStUvWxYz",
+    "driveFileName": "Rick Astley - Never Gonna Give You Up.md",
+    "driveUrl": "https://drive.google.com/file/d/1AbCdEfGhIjKlMnOpQrStUvWxYz/view"
+  }
+  ```
+
+Al recibir esta respuesta, NestJS:
+1. Registra el éxito en sus logs.
+2. Emite el evento WebSocket `summary:driveSynced` hacia el frontend Angular para notificar en pantalla al usuario en tiempo real.
+3. **Mantiene cerradas todas las puertas de entrada externas.**
+

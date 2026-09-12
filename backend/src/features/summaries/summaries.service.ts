@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  Logger,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, ILike } from 'typeorm';
 import { VideoSummary, SummaryStatus } from './entities/video-summary.entity';
@@ -111,6 +116,40 @@ export class SummariesService {
     await this.summariesRepository.remove(summary);
     this.gateway.notifySummaryDeleted(id);
     return { deleted: true };
+  }
+
+  async syncSummaryToDrive(
+    id: string,
+  ): Promise<{ success: boolean; message: string }> {
+    const summary = await this.findOne(id);
+
+    if (!summary.markdownContent) {
+      throw new BadRequestException(
+        'El resumen no cuenta con contenido Markdown generado para sincronizar.',
+      );
+    }
+
+    const success = await this.driveSyncService.syncToDrive({
+      id: summary.id,
+      videoTitle: summary.videoTitle || 'Resumen de Video',
+      channelName: summary.channelName,
+      markdownContent: summary.markdownContent,
+      youtubeUrl: summary.youtubeUrl,
+    });
+
+    if (!success) {
+      return {
+        success: false,
+        message:
+          'No se pudo sincronizar con Google Drive. Verifica que N8N_DRIVE_WEBHOOK_URL esté configurado y que n8n esté activo.',
+      };
+    }
+
+    return {
+      success: true,
+      message:
+        'Sincronización con Google Drive disparada exitosamente hacia n8n.',
+    };
   }
 
   async executePipeline(id: string, youtubeUrl: string): Promise<void> {
