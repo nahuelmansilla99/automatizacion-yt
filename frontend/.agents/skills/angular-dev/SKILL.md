@@ -15,7 +15,8 @@ description: >-
 2. Seguir la guía de estilos y buenas prácticas de Angular para mantenibilidad y performance.
 3. Usar el Angular CLI para scaffolding de componentes, services, directivas, pipes y rutas.
 4. **Después de generar código, ejecutar `ng build`** para verificar que no hay errores de compilación. No saltear este paso.
-5. **Separación de archivos obligatoria**: Cada componente o feature debe tener sus propios archivos `.ts`, `.html` y `.css` en su respectiva carpeta (usando `templateUrl` y `styleUrl`). No usar templates ni estilos inline dentro de los archivos `.ts`.
+5. **Separación de archivos obligatoria**: Cada componente o feature debe tener sus propios archivos `.ts`, `.html`, `.css` y `.spec.ts` en su respectiva carpeta (usando `templateUrl` y `styleUrl`). No usar templates ni estilos inline dentro de los archivos `.ts`.
+6. **Testing obligatorio por componente/feature**: Cada nuevo componente o feature DEBE crearse junto con su archivo de test unitario `[nombre].spec.ts` en su propia carpeta, aplicando la filosofía zoneless y async-first (`await fixture.whenStable()`).
 
 ---
 
