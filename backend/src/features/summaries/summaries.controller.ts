@@ -50,6 +50,17 @@ export class SummariesController {
     };
   }
 
+  @Post(':id/sync-drive')
+  @HttpCode(HttpStatus.OK)
+  async syncToDrive(@Param('id', ParseUUIDPipe) id: string) {
+    const result = await this.summariesService.syncSummaryToDrive(id);
+    return {
+      statusCode: HttpStatus.OK,
+      message: result.message,
+      data: result,
+    };
+  }
+
   @Delete(':id')
   async remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.summariesService.remove(id);

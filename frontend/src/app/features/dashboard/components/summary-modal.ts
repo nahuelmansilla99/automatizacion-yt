@@ -3,6 +3,7 @@ import { DatePipe } from '@angular/common';
 import { marked } from 'marked';
 import { SummariesStore } from '../store/summaries.store';
 import { ToastService } from '../../../core/services/toast.service';
+import { SummaryApiService } from '../../../core/services/summary-api.service';
 
 @Component({
   selector: 'app-summary-modal',
@@ -56,6 +57,20 @@ import { ToastService } from '../../../core/services/toast.service';
                 <span>💾 Descargar .md</span>
               </button>
 
+              <button
+                (click)="syncToDrive()"
+                [disabled]="syncingDrive()"
+                class="flex items-center gap-1.5 rounded-lg bg-[rgba(131,165,152,0.15)] hover:bg-[rgba(131,165,152,0.25)] text-[var(--bright-blue)] px-3 py-1.5 text-xs font-semibold border border-[rgba(131,165,152,0.3)] cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Sincronizar archivo .md con Google Drive vía n8n"
+              >
+                @if (syncingDrive()) {
+                  <span class="animate-spin">⏳</span>
+                  <span>Subiendo...</span>
+                } @else {
+                  <span>☁ Subir a Drive</span>
+                }
+              </button>
+
               <a
                 [href]="summary.youtubeUrl"
                 target="_blank"
@@ -107,8 +122,10 @@ import { ToastService } from '../../../core/services/toast.service';
 export class SummaryModalComponent {
   readonly store = inject(SummariesStore);
   readonly toast = inject(ToastService);
+  readonly api = inject(SummaryApiService);
 
   readonly copied = signal(false);
+  readonly syncingDrive = signal(false);
 
   readonly renderedMarkdown = computed(() => {
     const raw = this.store.selectedSummary()?.markdownContent;
@@ -150,5 +167,33 @@ export class SummaryModalComponent {
     link.click();
     URL.revokeObjectURL(url);
     this.toast.success(`Archivo "${fileName}" descargado`);
+  }
+
+  syncToDrive() {
+    const summary = this.store.selectedSummary();
+    if (!summary?.id) return;
+
+    this.syncingDrive.set(true);
+    this.api.syncToDrive(summary.id).subscribe({
+      next: (res) => {
+        this.syncingDrive.set(false);
+        if (res.data?.success) {
+          this.toast.success('¡Enviado a Google Drive vía n8n con éxito!');
+        } else {
+          this.toast.error(
+            res.data?.message ||
+              res.message ||
+              'Error al sincronizar con Google Drive',
+          );
+        }
+      },
+      error: (err) => {
+        this.syncingDrive.set(false);
+        const msg =
+          err.error?.message ||
+          'Error al conectar con el servidor para sincronizar con Drive';
+        this.toast.error(msg);
+      },
+    });
   }
 }

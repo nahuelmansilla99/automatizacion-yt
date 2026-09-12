@@ -1,10 +1,12 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { HttpService } from '@nestjs/axios';
-import { ConfigService } from '@nestjs/config';
 import { SummariesService } from './summaries.service';
 import { SummaryStatus } from './entities/video-summary.entity';
 import { SummariesGateway } from '../notifications/summaries.gateway';
+import { TranscriptionService } from './services/transcription.service';
+import { GeminiService } from './services/gemini.service';
+import { DriveSyncService } from './services/drive-sync.service';
 
 const jest = vi;
 
@@ -12,8 +14,9 @@ describe('SummariesService', () => {
   let service: SummariesService;
   let mockRepo: any;
   let mockGateway: any;
-  let mockHttp: any;
-  let mockConfig: any;
+  let mockTranscriptionService: any;
+  let mockGeminiService: any;
+  let mockDriveSyncService: any;
 
   beforeEach(async () => {
     mockRepo = {
@@ -28,7 +31,12 @@ describe('SummariesService', () => {
         id: 'mock-uuid-1234',
         youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
         status: SummaryStatus.PENDING,
+        videoTitle: null,
+        channelName: null,
+        markdownContent: null,
+        errorMessage: null,
       }),
+      update: jest.fn().mockResolvedValue(true),
       remove: jest.fn().mockResolvedValue(true),
     };
 
@@ -39,12 +47,22 @@ describe('SummariesService', () => {
       notifySummaryDeleted: jest.fn(),
     };
 
-    mockHttp = {
-      post: jest.fn(),
+    mockTranscriptionService = {
+      fetchVideoData: jest.fn().mockResolvedValue({
+        videoTitle: 'Test Title',
+        channelName: 'Test Channel',
+        transcript: 'This is a sample video transcript.',
+      }),
     };
 
-    mockConfig = {
-      get: jest.fn().mockReturnValue(''),
+    mockGeminiService = {
+      generateSummary: jest
+        .fn()
+        .mockResolvedValue('# Resumen\n\nContenido en markdown'),
+    };
+
+    mockDriveSyncService = {
+      syncToDrive: jest.fn().mockResolvedValue(true),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -55,16 +73,20 @@ describe('SummariesService', () => {
           useValue: mockRepo,
         },
         {
-          provide: HttpService,
-          useValue: mockHttp,
-        },
-        {
-          provide: ConfigService,
-          useValue: mockConfig,
-        },
-        {
           provide: SummariesGateway,
           useValue: mockGateway,
+        },
+        {
+          provide: TranscriptionService,
+          useValue: mockTranscriptionService,
+        },
+        {
+          provide: GeminiService,
+          useValue: mockGeminiService,
+        },
+        {
+          provide: DriveSyncService,
+          useValue: mockDriveSyncService,
         },
       ],
     }).compile();
@@ -77,6 +99,10 @@ describe('SummariesService', () => {
   });
 
   it('should create a summary in PENDING status and notify gateway', async () => {
+    const spyExecute = vi
+      .spyOn(service, 'executePipeline')
+      .mockImplementation(async () => {});
+
     const result = await service.create({
       youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
     });
@@ -85,10 +111,148 @@ describe('SummariesService', () => {
     expect(result.status).toBe(SummaryStatus.PENDING);
     expect(mockRepo.save).toHaveBeenCalled();
     expect(mockGateway.notifySummaryCreated).toHaveBeenCalled();
+    expect(spyExecute).toHaveBeenCalledWith(
+      'mock-uuid-1234',
+      'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    );
+  });
+
+  it('should execute pipeline successfully to SUCCESS and call drive sync', async () => {
+    await service.executePipeline(
+      'mock-uuid-1234',
+      'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    );
+
+    expect(mockTranscriptionService.fetchVideoData).toHaveBeenCalledWith(
+      'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    );
+    expect(mockRepo.update).toHaveBeenCalledWith('mock-uuid-1234', {
+      videoTitle: 'Test Title',
+      channelName: 'Test Channel',
+    });
+    expect(mockGeminiService.generateSummary).toHaveBeenCalledWith(
+      'Test Title',
+      'Test Channel',
+      'This is a sample video transcript.',
+    );
+    expect(mockRepo.save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 'mock-uuid-1234',
+        status: SummaryStatus.SUCCESS,
+        markdownContent: '# Resumen\n\nContenido en markdown',
+        errorMessage: null,
+      }),
+    );
+    expect(mockGateway.notifySummaryUpdated).toHaveBeenCalled();
+    expect(mockDriveSyncService.syncToDrive).toHaveBeenCalledWith({
+      id: 'mock-uuid-1234',
+      videoTitle: 'Test Title',
+      channelName: 'Test Channel',
+      markdownContent: '# Resumen\n\nContenido en markdown',
+      youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    });
+  });
+
+  it('should handle pipeline errors, set status to ERROR, and notify gateway', async () => {
+    mockTranscriptionService.fetchVideoData.mockRejectedValue(
+      new Error('El video no contiene subtítulos o transcripción disponible.'),
+    );
+
+    await service.executePipeline(
+      'mock-uuid-1234',
+      'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    );
+
+    expect(mockRepo.save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 'mock-uuid-1234',
+        status: SummaryStatus.ERROR,
+        errorMessage:
+          'El video no contiene subtítulos o transcripción disponible.',
+      }),
+    );
+    expect(mockGateway.notifySummaryError).toHaveBeenCalled();
+  });
+
+  it('should retry a summary and trigger executePipeline', async () => {
+    const spyExecute = vi
+      .spyOn(service, 'executePipeline')
+      .mockImplementation(async () => {});
+
+    const result = await service.retry('mock-uuid-1234');
+
+    expect(result.status).toBe(SummaryStatus.PENDING);
+    expect(result.errorMessage).toBeNull();
+    expect(mockGateway.notifySummaryUpdated).toHaveBeenCalled();
+    expect(spyExecute).toHaveBeenCalledWith(
+      'mock-uuid-1234',
+      'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    );
   });
 
   it('should find one summary by id', async () => {
     const result = await service.findOne('mock-uuid-1234');
     expect(result.id).toBe('mock-uuid-1234');
+  });
+
+  it('should remove a summary and notify gateway', async () => {
+    const result = await service.remove('mock-uuid-1234');
+    expect(result.deleted).toBe(true);
+    expect(mockGateway.notifySummaryDeleted).toHaveBeenCalledWith(
+      'mock-uuid-1234',
+    );
+  });
+
+  describe('syncSummaryToDrive', () => {
+    it('should throw BadRequestException if summary has no markdownContent', async () => {
+      mockRepo.findOne.mockResolvedValueOnce({
+        id: 'mock-uuid-1234',
+        videoTitle: 'Test Video',
+        markdownContent: null,
+      });
+
+      await expect(
+        service.syncSummaryToDrive('mock-uuid-1234'),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should call driveSyncService.syncToDrive and return success when sync succeeds', async () => {
+      mockRepo.findOne.mockResolvedValueOnce({
+        id: 'mock-uuid-1234',
+        videoTitle: 'Video de Prueba',
+        channelName: 'Canal Dev',
+        markdownContent: '# Resumen válido',
+        youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      });
+      mockDriveSyncService.syncToDrive.mockResolvedValueOnce(true);
+
+      const result = await service.syncSummaryToDrive('mock-uuid-1234');
+
+      expect(mockDriveSyncService.syncToDrive).toHaveBeenCalledWith({
+        id: 'mock-uuid-1234',
+        videoTitle: 'Video de Prueba',
+        channelName: 'Canal Dev',
+        markdownContent: '# Resumen válido',
+        youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      });
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('exitosamente');
+    });
+
+    it('should return success false and descriptive message when driveSyncService fails', async () => {
+      mockRepo.findOne.mockResolvedValueOnce({
+        id: 'mock-uuid-1234',
+        videoTitle: 'Video de Prueba',
+        channelName: 'Canal Dev',
+        markdownContent: '# Resumen válido',
+        youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      });
+      mockDriveSyncService.syncToDrive.mockResolvedValueOnce(false);
+
+      const result = await service.syncSummaryToDrive('mock-uuid-1234');
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('No se pudo sincronizar');
+    });
   });
 });

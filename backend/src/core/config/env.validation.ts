@@ -18,7 +18,11 @@ export const envValidationSchema = Joi.object({
     .default(false),
 
   N8N_WEBHOOK_URL: Joi.string().uri().allow('').optional(),
+  N8N_DRIVE_WEBHOOK_URL: Joi.string().uri().allow('').optional(),
   WEBHOOK_SECRET: Joi.string().required(),
 
   SUPADATA_API_KEY: Joi.string().allow('').optional(),
+
+  GEMINI_API_KEY: Joi.string().allow('').optional(),
+  GEMINI_MODEL: Joi.string().default('gemini-3.6-flash'),
 });
