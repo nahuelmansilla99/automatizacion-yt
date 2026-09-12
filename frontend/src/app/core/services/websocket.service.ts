@@ -65,6 +65,16 @@ export class WebSocketService {
     this.socket.on('summary:deleted', (data: { id: string }) => {
       this.onSummaryDeletedCallback?.(data.id);
     });
+
+    this.socket.on(
+      'summary:driveSynced',
+      (data: { id: string; driveFileName?: string; driveUrl?: string }) => {
+        const title = data.driveFileName
+          ? `Nota "${data.driveFileName}" guardada en Google Drive`
+          : 'Resumen sincronizado exitosamente con Google Drive';
+        this.toast.success(title, '☁ Google Drive');
+      },
+    );
   }
 
   registerCallbacks(

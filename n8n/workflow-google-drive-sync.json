@@ -1,0 +1,107 @@
+{
+  "name": "Google Drive - Obsidian Sync",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "drive-sync",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "96b6e41b-4394-4d89-9831-29472e38c92b",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        220,
+        300
+      ],
+      "webhookId": "drive-sync"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Obtener payload (soporta body anidado del Webhook o directo)\nconst data = $input.item.json.body || $input.item.json;\n\n// 2. Sanitizar el título del video para nombre de archivo válido (.md)\nconst rawTitle = data.videoTitle || 'Resumen-YouTube';\nconst cleanTitle = rawTitle\n  .replace(/[/\\\\?%*:|\"<>]/g, '-')\n  .replace(/\\s+/g, ' ')\n  .trim();\n\nconst fileName = `${cleanTitle}.md`;\nconst content = data.markdownContent || '# Sin contenido';\n\n// 3. Crear buffer binario en UTF-8 para Google Drive\nconst binaryBuffer = Buffer.from(content, 'utf-8');\n\nreturn {\n  json: {\n    id: data.id,\n    videoTitle: data.videoTitle,\n    channelName: data.channelName,\n    youtubeUrl: data.youtubeUrl,\n    fileName: fileName,\n    fileSizeBytes: binaryBuffer.length\n  },\n  binary: {\n    data: await this.helpers.prepareBinaryData(\n      binaryBuffer,\n      fileName,\n      'text/markdown'\n    )\n  }\n};"
+      },
+      "id": "e458e0a8-b648-4355-bfa3-0f7f3da112e1",
+      "name": "Preparar Archivo Markdown",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "binaryData": true,
+        "binaryPropertyName": "data",
+        "options": {}
+      },
+      "id": "18f97e20-3b47-4952-b89a-05d6cb44e8bc",
+      "name": "Google Drive: Subir Archivo",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        740,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": true,\n  \"id\": \"{{ $('Preparar Archivo Markdown').item.json.id }}\",\n  \"driveFileId\": \"{{ $json.id }}\",\n  \"driveFileName\": \"{{ $json.name }}\",\n  \"driveUrl\": \"{{ $json.webViewLink }}\"\n}",
+        "options": {}
+      },
+      "id": "c1f3a2b4-5e6d-4981-8b27-0fae2b1897c5",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1000,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Preparar Archivo Markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Archivo Markdown": {
+      "main": [
+        [
+          {
+            "node": "Google Drive: Subir Archivo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive: Subir Archivo": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f784e55e-4fc9-450b-967b-1cb8ff8014ea",
+  "tags": []
+}

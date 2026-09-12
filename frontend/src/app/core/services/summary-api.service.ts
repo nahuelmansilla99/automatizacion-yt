@@ -63,6 +63,20 @@ export class SummaryApiService {
     );
   }
 
+  syncToDrive(
+    id: string,
+  ): Observable<{
+    statusCode: number;
+    message: string;
+    data: { success: boolean; message: string };
+  }> {
+    return this.http.post<{
+      statusCode: number;
+      message: string;
+      data: { success: boolean; message: string };
+    }>(`${this.baseUrl}/summaries/${id}/sync-drive`, {});
+  }
+
   getMetrics(): Observable<AppMetricsResponse> {
     return this.http.get<AppMetricsResponse>(`${this.baseUrl}/metrics`);
   }

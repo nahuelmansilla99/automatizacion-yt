@@ -45,6 +45,20 @@
             <span>💾 Descargar .md</span>
           </button>
 
+          <button
+            (click)="syncToDrive()"
+            [disabled]="syncingDrive()"
+            class="flex items-center gap-1.5 rounded-lg bg-[rgba(131,165,152,0.15)] hover:bg-[rgba(131,165,152,0.25)] text-[var(--bright-blue)] px-3 py-1.5 text-xs font-semibold border border-[rgba(131,165,152,0.3)] cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Sincronizar archivo .md con Google Drive vía n8n"
+          >
+            @if (syncingDrive()) {
+              <span class="animate-spin">⏳</span>
+              <span>Subiendo...</span>
+            } @else {
+              <span>☁ Subir a Drive</span>
+            }
+          </button>
+
           <a
             [href]="summary.youtubeUrl"
             target="_blank"
