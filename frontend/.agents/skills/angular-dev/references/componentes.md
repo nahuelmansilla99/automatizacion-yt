@@ -194,4 +194,4 @@ Angular encapsula los estilos de cada componente por defecto (ViewEncapsulation.
 4. **Self-closing tags** siempre que no haya contenido proyectado
 5. **`track`** obligatorio en `@for` para performance
 6. **Importar** explícitamente las dependencias en `imports`
-7. **Separación de archivos obligatoria**: Cada componente debe tener sus archivos `.ts`, `.html` y `.css` en su respectiva carpeta. No incluir HTML ni CSS embebido/inline dentro del `.ts`.
+7. **Separación de archivos y testing obligatorios**: Cada componente debe tener sus archivos `.ts`, `.html`, `.css` y su test `.spec.ts` en su respectiva carpeta. No incluir HTML ni CSS embebido/inline dentro del `.ts`.

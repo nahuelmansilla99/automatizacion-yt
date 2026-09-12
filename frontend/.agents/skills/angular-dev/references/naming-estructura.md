@@ -35,14 +35,14 @@ Esta guía define las reglas de nombrado y la estructura de carpetas recomendada
 
 ### Archivos relacionados por Componente
 
-Cada componente o feature **debe tener su propia carpeta** que contenga obligatoriamente sus tres archivos separados (no usar templates ni estilos inline en el `.ts`):
+Cada componente o feature **debe tener su propia carpeta** que contenga obligatoriamente sus cuatro archivos separados (no usar templates ni estilos inline en el `.ts`):
 
 ```
 mi-componente/
 ├── mi-componente.ts        → Clase TypeScript con templateUrl y styleUrl
 ├── mi-componente.html      → Template HTML externo
 ├── mi-componente.css       → Estilos CSS del componente
-└── mi-componente.spec.ts   → Tests unitarios (opcional / recomendado)
+└── mi-componente.spec.ts   → Tests unitarios (OBLIGATORIO: cada componente/feature debe tener su test)
 ```
 
 ## Estructura de Carpetas Recomendada
@@ -61,43 +61,51 @@ src/app/
 │       ├── status-badge/
 │       │   ├── status-badge.ts
 │       │   ├── status-badge.html
-│       │   └── status-badge.css
+│       │   ├── status-badge.css
+│       │   └── status-badge.spec.ts
 │       ├── navbar/
 │       │   ├── navbar.ts
 │       │   ├── navbar.html
-│       │   └── navbar.css
+│       │   ├── navbar.css
+│       │   └── navbar.spec.ts
 │       └── toast-container/
 │           ├── toast-container.ts
 │           ├── toast-container.html
-│           └── toast-container.css
+│           ├── toast-container.css
+│           └── toast-container.spec.ts
 │
 ├── features/                → Módulos de negocio
 │   └── dashboard/
 │       ├── dashboard.ts             → Componente principal del feature
 │       ├── dashboard.html           → Template del dashboard
 │       ├── dashboard.css            → Estilos del dashboard
-│       ├── dashboard.spec.ts
+│       ├── dashboard.spec.ts        → Test unitario del feature
 │       ├── components/              → Componentes específicos del feature
 │       │   ├── url-input-card/
 │       │   │   ├── url-input-card.ts
 │       │   │   ├── url-input-card.html
-│       │   │   └── url-input-card.css
+│       │   │   ├── url-input-card.css
+│       │   │   └── url-input-card.spec.ts
 │       │   ├── supadata-metrics-card/
 │       │   │   ├── supadata-metrics-card.ts
 │       │   │   ├── supadata-metrics-card.html
-│       │   │   └── supadata-metrics-card.css
+│       │   │   ├── supadata-metrics-card.css
+│       │   │   └── supadata-metrics-card.spec.ts
 │       │   ├── summary-table/
 │       │   │   ├── summary-table.ts
 │       │   │   ├── summary-table.html
-│       │   │   └── summary-table.css
+│       │   │   ├── summary-table.css
+│       │   │   └── summary-table.spec.ts
 │       │   ├── summary-modal/
 │       │   │   ├── summary-modal.ts
 │       │   │   ├── summary-modal.html
-│       │   │   └── summary-modal.css
+│       │   │   ├── summary-modal.css
+│       │   │   └── summary-modal.spec.ts
 │       │   └── error-modal/
 │       │       ├── error-modal.ts
 │       │       ├── error-modal.html
-│       │       └── error-modal.css
+│       │       ├── error-modal.css
+│       │       └── error-modal.spec.ts
 │       └── store/
 │           └── summaries.store.ts   → Store local del feature
 │
@@ -136,4 +144,4 @@ src/app/
 3. **Index files (`index.ts`)** para re-exportar el API público de un directorio
 4. **Agrupar por feature**, no por tipo técnico
 5. **`core/` para singletons, `shared/` para reutilizables, `features/` para negocio**
-6. **Separación de archivos obligatoria**: Todo componente debe residir en su propia carpeta con sus respectivos archivos `.ts`, `.html` y `.css` (evitando HTML y CSS inline)
+6. **Separación y testing obligatorios**: Todo componente o feature debe residir en su propia carpeta con sus cuatro archivos obligatorios: `.ts`, `.html`, `.css` y `.spec.ts` (evitando HTML y CSS inline)
