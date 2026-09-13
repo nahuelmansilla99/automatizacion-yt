@@ -158,15 +158,63 @@ export class SummariesService {
     );
 
     try {
-      // 1. Obtener metadata y transcripción
-      const { videoTitle, channelName, transcript } =
-        await this.transcriptionService.fetchVideoData(youtubeUrl);
+      let videoTitle = 'Video de YouTube';
+      let channelName = 'Canal de YouTube';
+      let transcript: string | null = null;
 
-      // Actualizar metadata temprana en la base de datos
-      await this.summariesRepository.update(id, {
-        videoTitle,
-        channelName,
+      // 1. Verificar si este registro ya posee transcripción guardada (ej. en reintentos tras fallo de Gemini)
+      const currentSummary = await this.summariesRepository.findOne({
+        where: { id },
       });
+
+      if (currentSummary?.transcript) {
+        this.logger.log(
+          `Reutilizando transcripción existente en BD para ID: ${id}. Omitiendo llamada a Supadata.`,
+        );
+        videoTitle = currentSummary.videoTitle || videoTitle;
+        channelName = currentSummary.channelName || channelName;
+        transcript = currentSummary.transcript;
+      } else {
+        // Buscar si ya existe otro registro previo con la misma URL que tenga transcripción
+        const existingSummary = await this.summariesRepository.findOne({
+          where: { youtubeUrl, status: SummaryStatus.SUCCESS },
+          order: { createdAt: 'DESC' },
+        });
+
+        if (existingSummary?.transcript) {
+          this.logger.log(
+            `Reutilizando transcripción de registro previo para ${youtubeUrl}. Omitiendo llamada a Supadata.`,
+          );
+          videoTitle = existingSummary.videoTitle || videoTitle;
+          channelName = existingSummary.channelName || channelName;
+          transcript = existingSummary.transcript;
+
+          await this.summariesRepository.update(id, {
+            videoTitle,
+            channelName,
+            transcript,
+          });
+        }
+      }
+
+      // Si aún no tenemos transcripción, consultamos a Supadata
+      if (!transcript) {
+        this.logger.log(
+          `Consultando Supadata para obtener transcripción de ${youtubeUrl}...`,
+        );
+        const videoData =
+          await this.transcriptionService.fetchVideoData(youtubeUrl);
+        videoTitle = videoData.videoTitle;
+        channelName = videoData.channelName;
+        transcript = videoData.transcript;
+
+        // Persistir tempranamente metadata y transcripción en la base de datos
+        await this.summariesRepository.update(id, {
+          videoTitle,
+          channelName,
+          transcript,
+        });
+      }
 
       // 2. Generar resumen estructurado con Gemini
       const markdownContent = await this.geminiService.generateSummary(
@@ -186,6 +234,7 @@ export class SummariesService {
 
       summary.videoTitle = videoTitle;
       summary.channelName = channelName;
+      summary.transcript = transcript;
       summary.markdownContent = markdownContent;
       summary.status = SummaryStatus.SUCCESS;
       summary.errorMessage = null;

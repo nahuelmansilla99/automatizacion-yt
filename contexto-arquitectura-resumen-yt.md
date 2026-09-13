@@ -40,9 +40,10 @@ El sistema permite ingresar enlaces de YouTube, hacer un seguimiento asíncrono 
 ### Base de Datos: PostgreSQL
 Esquema (`VideoSummary`):
 *   `id`: UUID (Primary Key).
-*   `youtubeUrl`: String.
-*   `videoTitle`: String.
-*   `channelName`: String.
+*   `youtubeUrl`: String (URL del video de YouTube).
+*   `videoTitle`: String (Título extraído vía oEmbed o Supadata).
+*   `channelName`: String (Nombre del canal o autor).
+*   `transcript`: Text (Almacena la transcripción completa obtenida de Supadata para reutilización en reintentos y evitar consumo redundante de créditos).
 *   `markdownContent`: Text (Almacena el resumen generado por Gemini).
 *   `status`: Enum (`PENDING`, `SUCCESS`, `ERROR`).
 *   `errorMessage`: Text (Almacena la causa exacta en caso de fallo).
@@ -55,30 +56,47 @@ Esquema (`VideoSummary`):
     2.  **Google Drive Node:** Sube o actualiza el archivo `.md` en la carpeta configurada de Obsidian.
     *   *Nota:* Ya no requiere Error Triggers complejos ni webhooks de retorno a NestJS.
 
-## 4. Flujo de Ejecución Asíncrona
+## 4. Flujo de Ejecución Asíncrona y Estrategia de Reintentos
 
 ```
-[ Angular ] ──(1. POST /api/summaries)──> [ NestJS ] ──(2. Responde 201 Created)──> [ Angular ]
+[ Angular ] ──(1. POST /api/summaries)──> [ NestJS ] ──(2. Responde 202 Accepted)──> [ Angular ]
                                               │
                                               ▼ (3. Background Pipeline)
-                                  ┌─────────────────────────────┐
-                                  │ a. YouTube oEmbed (metadata)│
-                                  │ b. Supadata (subtítulos)    │
-                                  │ c. Google Gemini (resumen)  │
-                                  │ d. Guarda en PostgreSQL     │
-                                  └─────────────────────────────┘
-                                              │
-                    ┌─────────────────────────┴─────────────────────────┐
-                    ▼ (Éxito)                                           ▼ (Fallo)
-         [ Status: SUCCESS ]                                   [ Status: ERROR ]
-         [ WebSocket: summaryUpdated ]                         [ WebSocket: summaryError ]
-                    │
-                    ▼ (Fire & Forget en background)
-         [ n8n: Subir a Google Drive ]
+                                  ┌───────────────────────────────────────────────┐
+                                  │ ¿Existe transcript en este registro o en BD?  │
+                                  └───────┬───────────────────────────────┬───────┘
+                                          │ NO                            │ SÍ (Reintento / Caché)
+                                          ▼                               ▼
+                           ┌──────────────────────────────┐ ┌───────────────────────────┐
+                           │ a. YouTube oEmbed (metadata) │ │ Reutiliza transcript y    │
+                           │ b. Supadata (subtítulos)     │ │ metadata existente en BD  │
+                           │ c. Guarda transcript en BD   │ │ (0 tokens gastados)       │
+                           └──────────────┬───────────────┘ └─────────────┬─────────────┘
+                                          └───────────────┬───────────────┘
+                                                          ▼
+                                          ┌───────────────────────────────┐
+                                          │ d. Google Gemini (resumen)    │
+                                          │ e. Guarda en PostgreSQL       │
+                                          └───────────────┬───────────────┘
+                                                          │
+                    ┌─────────────────────────────────────┴─────────────────────────────────────┐
+                    ▼ (Éxito)                                                                   ▼ (Fallo en Gemini / Supadata)
+         [ Status: SUCCESS ]                                                           [ Status: ERROR ]
+         [ WebSocket: summaryUpdated ]                                                 [ WebSocket: summaryError ]
+                    │                                                                           │
+                    ▼ (Fire & Forget en background)                                             ▼
+         [ n8n: Subir a Google Drive ]                                                 [ Usuario pulsa "Reintentar" ]
+                                                                                                │
+                                                                                                ▼
+                                                                                       (Reejecuta pipeline reutilizando
+                                                                                        el transcript persistido)
 ```
 
-1.  Angular envía la URL a NestJS.
-2.  NestJS crea el registro en PostgreSQL (`PENDING`), emite evento WebSocket `summaryCreated` y responde inmediatamente al frontend.
-3.  NestJS ejecuta el pipeline en segundo plano:
-    *   **Vía Éxito:** Se consulta oEmbed y Supadata, Gemini genera el Markdown, NestJS actualiza el registro en base de datos a `SUCCESS` y notifica por WebSocket. En paralelo, dispara la sincronización secundaria con Drive hacia n8n.
-    *   **Vía Error:** El bloque `try/catch` nativo en NestJS captura el fallo exacto (ej. video sin subtítulos, error de cuota o URL inválida), actualiza a `ERROR`, almacena el mensaje descriptivo en `errorMessage` y emite `summaryError` vía WebSocket inmediatamente.
+1.  **Recepción:** Angular envía la URL a NestJS (`POST /api/summaries`).
+2.  **Registro Inicial:** NestJS crea el registro en PostgreSQL (`PENDING`), emite el evento WebSocket `summaryCreated` y responde de inmediato al frontend.
+3.  **Procesamiento en Segundo Plano con Detección de Caché:**
+    *   **Paso A (Verificación de Transcripción Previa):** Antes de consultar a Supadata, NestJS verifica si el registro actual ya cuenta con `transcript` (caso de reintento tras fallo en Gemini) o si existe en la base de datos un resumen exitoso previo con la misma `youtubeUrl`.
+    *   **Paso B (Consulta a Supadata solo si es necesario):** Si no existe transcripción previa, consulta YouTube oEmbed y Supadata Transcript API. **Inmediatamente después de recibir la transcripción, la persiste en la base de datos** (`videoTitle`, `channelName`, `transcript`) antes de invocar a Gemini.
+    *   **Paso C (Generación con Gemini):** Se invoca a Gemini para generar el resumen Markdown estructurado.
+    *   **Vía Éxito:** Se actualiza el registro a `SUCCESS` con el `markdownContent` y se notifica por WebSocket (`summaryUpdated`). Se dispara la sincronización a Google Drive vía n8n en segundo plano.
+    *   **Vía Error:** Si Gemini falla (por cuota 429, timeout, saturación 503, etc.), el registro pasa a `ERROR` con el mensaje explicativo. **Dado que la transcripción ya quedó almacenada en la base de datos**, cuando el usuario hace clic en "Reintentar", el pipeline retoma directamente desde el paso de Gemini sin volver a consultar a Supadata, ahorrando créditos y acelerando el reintento.

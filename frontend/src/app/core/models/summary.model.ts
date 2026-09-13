@@ -5,6 +5,7 @@ export interface VideoSummary {
   youtubeUrl: string;
   videoTitle: string | null;
   channelName: string | null;
+  transcript?: string | null;
   markdownContent: string | null;
   status: SummaryStatus;
   errorMessage: string | null;

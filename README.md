@@ -1,4 +1,4 @@
-# Automatización de Resúmenes de YouTube (v2)
+# Automatización de Resúmenes de YouTube (v3)
 
 Plataforma integral para automatizar la extracción, transcripción y resumen de videos de YouTube con Inteligencia Artificial, almacenamiento en **Google Drive (Obsidian)** y visualización interactiva web con el tema **Obsidian Gruvbox**.
 
@@ -8,8 +8,10 @@ Plataforma integral para automatizar la extracción, transcripción y resumen de
 
 * **Frontend:** Angular v21 (Standalone components, Signals, Reactive State Store, Tailwind CSS v4 con paleta Obsidian Gruvbox).
 * **Backend:** NestJS 11 (TypeORM con PostgreSQL, WebSockets con Socket.IO para notificaciones en vivo, validación estricta con class-validator).
-* **Base de Datos:** PostgreSQL 16 aislado con volumen persistente dedicado.
-* **Automatización:** n8n en VPS Dokploy (Supadata para transcripción y metadatos, Gemini LLM Chain con reintentos para generar Markdown estructurado, Google Drive para almacenamiento de Obsidian).
+  * **Pipeline Nativo:** Extracción vía YouTube oEmbed, transcripción vía Supadata Transcript API y síntesis con Google Gemini (`@google/genai`).
+  * **Persistencia Temprana y Caché de Transcripciones:** El texto de la transcripción se guarda de inmediato en PostgreSQL. En caso de reintentar tras un fallo de la IA o al ingresar una URL previamente analizada, se reutiliza el texto existente sin gastar tokens extra de Supadata.
+* **Base de Datos:** PostgreSQL 16 aislado con volumen persistente dedicado y migraciones versionadas automáticas.
+* **Automatización Secundaria:** Micro-worker en n8n para la sincronización de archivos Markdown en Google Drive (Obsidian) en modo *Fire & Forget*.
 * **Infraestructura y Red:** VPS con Dokploy, Cloudflare Tunnels y capa de seguridad Zero Trust (Cloudflare Access con One-Time PIN) en `resumen.ncodem.com`.
 
 ---

@@ -3,7 +3,7 @@ import { DatePipe } from '@angular/common';
 import { marked } from 'marked';
 import { SummariesStore } from '../../store/summaries.store';
 import { ToastService } from '../../../../core/services/toast.service';
-import { SummaryApiService } from '../../../core/services/summary-api.service';
+import { SummaryApiService } from '../../../../core/services/summary-api.service';
 
 
 @Component({

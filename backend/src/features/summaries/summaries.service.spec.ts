@@ -129,6 +129,7 @@ describe('SummariesService', () => {
     expect(mockRepo.update).toHaveBeenCalledWith('mock-uuid-1234', {
       videoTitle: 'Test Title',
       channelName: 'Test Channel',
+      transcript: 'This is a sample video transcript.',
     });
     expect(mockGeminiService.generateSummary).toHaveBeenCalledWith(
       'Test Title',
@@ -139,6 +140,7 @@ describe('SummariesService', () => {
       expect.objectContaining({
         id: 'mock-uuid-1234',
         status: SummaryStatus.SUCCESS,
+        transcript: 'This is a sample video transcript.',
         markdownContent: '# Resumen\n\nContenido en markdown',
         errorMessage: null,
       }),
@@ -151,6 +153,41 @@ describe('SummariesService', () => {
       markdownContent: '# Resumen\n\nContenido en markdown',
       youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
     });
+  });
+
+  it('should reuse existing transcript on retry without calling Supadata', async () => {
+    mockRepo.findOne.mockResolvedValueOnce({
+      id: 'mock-uuid-1234',
+      youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      status: SummaryStatus.PENDING,
+      videoTitle: 'Cached Title',
+      channelName: 'Cached Channel',
+      transcript: 'Already saved transcript from previous attempt',
+      markdownContent: null,
+      errorMessage: null,
+    });
+
+    await service.executePipeline(
+      'mock-uuid-1234',
+      'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    );
+
+    // No debe haber llamado a Supadata
+    expect(mockTranscriptionService.fetchVideoData).not.toHaveBeenCalled();
+
+    // Debe llamar a Gemini con la transcripción existente
+    expect(mockGeminiService.generateSummary).toHaveBeenCalledWith(
+      'Cached Title',
+      'Cached Channel',
+      'Already saved transcript from previous attempt',
+    );
+    expect(mockRepo.save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 'mock-uuid-1234',
+        status: SummaryStatus.SUCCESS,
+        transcript: 'Already saved transcript from previous attempt',
+      }),
+    );
   });
 
   it('should handle pipeline errors, set status to ERROR, and notify gateway', async () => {
