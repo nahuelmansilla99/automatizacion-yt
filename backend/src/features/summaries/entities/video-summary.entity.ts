@@ -29,6 +29,9 @@ export class VideoSummary {
   channelName: string | null;
 
   @Column({ type: 'text', nullable: true })
+  transcript: string | null;
+
+  @Column({ type: 'text', nullable: true })
   markdownContent: string | null;
 
   @Index()

@@ -1,59 +1,65 @@
-# TempFrontend
+# Frontend - Automatización de Resúmenes de YouTube
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.23.
+Aplicación web desarrollada en **Angular v21** con **Standalone Components**, **Signals Store**, **Tailwind CSS v4** y una paleta inspirada en **Obsidian Gruvbox**.
 
-## Development server
+---
 
-To start a local development server, run:
+## 🎨 Características Principales
 
-```bash
-ng serve
+* **Dashboard Unificado:**
+  * **Card de Envío de URL:** Validación de URLs de YouTube y envío al backend para procesamiento asíncrono.
+  * **Card de Métricas de Supadata:** Consulta de créditos consumidos, créditos restantes y porcentaje de cuota utilizada con soporte de refresco manual.
+  * **Tabla de Historial:** Listado de resúmenes con paginación, filtros por estado (`PENDING`, `SUCCESS`, `ERROR`) y búsqueda por título.
+* **Reactividad en Tiempo Real:**
+  * Conexión WebSockets con Socket.IO para actualizar el estado del resumen en pantalla inmediatamente al cambiar (`summaryCreated`, `summaryUpdated`, `summaryError`, `summaryDeleted`).
+* **Visor de Resúmenes (Markdown / Obsidian):**
+  * Modal interactivo que renderiza el Markdown generado por Gemini con estilos adaptados a Obsidian.
+  * Botón para copiar al portapapeles y botón para disparar la sincronización manual hacia Google Drive vía n8n.
+* **Manejo de Errores y Reintentos:**
+  * Visualización clara del mensaje de error exacto (ej. sin subtítulos, cuota excedida).
+  * Botón de **Reintentar** que reejecuta el resumen en el backend sin volver a consumir créditos de Supadata si la transcripción ya fue obtenida.
+
+---
+
+## 📁 Estructura del Proyecto
+
+```text
+frontend/src/app/
+├── core/
+│   ├── models/summary.model.ts        # Interfaces (VideoSummary con transcript opcional, métricas)
+│   └── services/
+│       ├── summary-api.service.ts     # Cliente HTTP hacia la API REST de NestJS
+│       ├── websocket.service.ts       # Conexión Socket.IO con el backend
+│       └── toast.service.ts           # Notificaciones visuales de usuario
+│
+├── features/dashboard/
+│   ├── components/
+│   │   ├── url-input-card/            # Formulario de entrada de videos
+│   │   ├── supadata-metrics-card/     # Visualización de créditos y consumo
+│   │   ├── summary-table/             # Tabla de historial y estados
+│   │   ├── summary-modal/             # Previsualización del Markdown generado
+│   │   └── error-modal/               # Detalle del fallo
+│   ├── store/summaries.store.ts       # Signal Store reactivo para estado global
+│   └── dashboard.ts                   # Componente contenedor del Dashboard
+│
+└── shared/
+    └── components/                    # Navbar, StatusBadge, ToastContainer
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+---
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## 🚀 Comandos de Desarrollo
 
 ```bash
-ng generate component component-name
+# Instalar dependencias
+npm install
+
+# Servidor de desarrollo local (http://localhost:4200)
+npm start
+
+# Ejecutar pruebas unitarias
+npm test
+
+# Compilación de producción
+npm run build
 ```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.

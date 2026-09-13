@@ -11,15 +11,15 @@ describe('App', () => {
     }).compileComponents();
   });
 
-  it('should create the app', () => {
+  it('debería crear el componente raíz de la aplicación', async () => {
     const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
     const app = fixture.componentInstance;
     expect(app).toBeTruthy();
   });
 
-  it('should render the navbar title', async () => {
+  it('debería renderizar el título en el navbar', async () => {
     const fixture = TestBed.createComponent(App);
-    fixture.detectChanges();
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('h1')?.textContent).toContain('Obsidian YT Resúmenes');

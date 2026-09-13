@@ -56,4 +56,14 @@ export class SummariesGateway
   notifySummaryDeleted(id: string) {
     this.server.emit('summary:deleted', { id });
   }
+
+  notifyDriveSynced(payload: {
+    id: string;
+    driveFileId?: string;
+    driveFileName?: string;
+    driveUrl?: string;
+  }) {
+    this.server.emit('summary:driveSynced', payload);
+    this.server.emit(`summary:${payload.id}:driveSynced`, payload);
+  }
 }

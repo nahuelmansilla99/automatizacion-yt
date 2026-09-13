@@ -1,0 +1,18 @@
+<div class="space-y-6">
+  <!-- Fila Superior: Input de URL y Métricas de Supadata -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2">
+      <app-url-input-card />
+    </div>
+    <div class="lg:col-span-1">
+      <app-supadata-metrics-card />
+    </div>
+  </div>
+
+  <!-- Fila Inferior: Tabla de Historial -->
+  <app-summary-table />
+
+  <!-- Modales -->
+  <app-summary-modal />
+  <app-error-modal />
+</div>
