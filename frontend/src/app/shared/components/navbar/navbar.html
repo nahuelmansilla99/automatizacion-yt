@@ -1,6 +1,6 @@
 <header class="border-b border-[var(--dark2)] bg-[var(--dark0-hard)] px-4 py-3 sm:px-8">
   <div class="mx-auto flex max-w-7xl items-center justify-between">
-    <!-- Logo & Titulo -->
+    <!-- Logo, Titulo & Nav -->
     <div class="flex items-center gap-3">
       <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--dark1)] border border-[var(--dark2)] text-[var(--bright-orange)] shadow-md">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
@@ -20,6 +20,25 @@
           Extracción, transcripción y exportación a Obsidian Markdown
         </p>
       </div>
+
+      <!-- Nav Links -->
+      <nav class="hidden sm:flex items-center gap-1 ml-6">
+        <a
+          routerLink="/"
+          routerLinkActive="text-[var(--bright-orange)] border-[var(--bright-orange)]"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="px-3 py-1.5 rounded-lg text-sm font-medium border border-transparent text-[var(--light3)] hover:text-[var(--light0)] hover:border-[var(--dark3)] transition-colors"
+        >
+          🏠 Dashboard
+        </a>
+        <a
+          routerLink="/prompts"
+          routerLinkActive="text-[var(--bright-orange)] border-[var(--bright-orange)]"
+          class="px-3 py-1.5 rounded-lg text-sm font-medium border border-transparent text-[var(--light3)] hover:text-[var(--light0)] hover:border-[var(--dark3)] transition-colors"
+        >
+          🧠 Prompts
+        </a>
+      </nav>
     </div>
 
     <!-- Indicador de conexión WebSocket & Dominio -->

@@ -7,6 +7,7 @@ import { SummariesGateway } from '../notifications/summaries.gateway';
 import { TranscriptionService } from './services/transcription.service';
 import { GeminiService } from './services/gemini.service';
 import { DriveSyncService } from './services/drive-sync.service';
+import { PromptsService } from '../prompts/prompts.service';
 
 const jest = vi;
 
@@ -17,6 +18,7 @@ describe('SummariesService', () => {
   let mockTranscriptionService: any;
   let mockGeminiService: any;
   let mockDriveSyncService: any;
+  let mockPromptsService: any;
 
   beforeEach(async () => {
     mockRepo = {
@@ -35,6 +37,8 @@ describe('SummariesService', () => {
         channelName: null,
         markdownContent: null,
         errorMessage: null,
+        promptId: null,
+        promptSnapshot: null,
       }),
       update: jest.fn().mockResolvedValue(true),
       remove: jest.fn().mockResolvedValue(true),
@@ -65,6 +69,20 @@ describe('SummariesService', () => {
       syncToDrive: jest.fn().mockResolvedValue(true),
     };
 
+    mockPromptsService = {
+      getActiveDefault: vi.fn().mockResolvedValue({
+        id: 'prompt-uuid-1',
+        name: 'Default Prompt',
+        content: 'System instruction text',
+      }),
+      findOne: vi.fn().mockResolvedValue({
+        id: 'prompt-uuid-1',
+        name: 'Default Prompt',
+        content: 'System instruction text',
+      }),
+      incrementUsage: vi.fn().mockResolvedValue(undefined),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         SummariesService,
@@ -87,6 +105,10 @@ describe('SummariesService', () => {
         {
           provide: DriveSyncService,
           useValue: mockDriveSyncService,
+        },
+        {
+          provide: PromptsService,
+          useValue: mockPromptsService,
         },
       ],
     }).compile();
@@ -114,6 +136,7 @@ describe('SummariesService', () => {
     expect(spyExecute).toHaveBeenCalledWith(
       'mock-uuid-1234',
       'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      undefined,
     );
   });
 
@@ -135,6 +158,7 @@ describe('SummariesService', () => {
       'Test Title',
       'Test Channel',
       'This is a sample video transcript.',
+      'System instruction text',
     );
     expect(mockRepo.save).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -143,6 +167,8 @@ describe('SummariesService', () => {
         transcript: 'This is a sample video transcript.',
         markdownContent: '# Resumen\n\nContenido en markdown',
         errorMessage: null,
+        promptId: 'prompt-uuid-1',
+        promptSnapshot: 'System instruction text',
       }),
     );
     expect(mockGateway.notifySummaryUpdated).toHaveBeenCalled();
@@ -165,6 +191,8 @@ describe('SummariesService', () => {
       transcript: 'Already saved transcript from previous attempt',
       markdownContent: null,
       errorMessage: null,
+      promptId: null,
+      promptSnapshot: null,
     });
 
     await service.executePipeline(
@@ -180,6 +208,7 @@ describe('SummariesService', () => {
       'Cached Title',
       'Cached Channel',
       'Already saved transcript from previous attempt',
+      'System instruction text',
     );
     expect(mockRepo.save).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -224,6 +253,7 @@ describe('SummariesService', () => {
     expect(spyExecute).toHaveBeenCalledWith(
       'mock-uuid-1234',
       'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+      undefined,
     );
   });
 

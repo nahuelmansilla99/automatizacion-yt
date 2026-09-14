@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
+import { provideRouter } from '@angular/router';
 import { NavbarComponent } from './navbar';
 import { SummariesStore } from '../../../features/dashboard/store/summaries.store';
 
@@ -18,6 +19,7 @@ describe('NavbarComponent', () => {
       imports: [NavbarComponent],
       providers: [
         { provide: SummariesStore, useValue: mockStore },
+        provideRouter([]),
       ],
     }).compileComponents();
 

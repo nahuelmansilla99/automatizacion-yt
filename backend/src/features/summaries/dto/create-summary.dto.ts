@@ -1,4 +1,10 @@
-import { IsNotEmpty, IsString, Matches } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  Matches,
+  IsOptional,
+  IsUUID,
+} from 'class-validator';
 
 export class CreateSummaryDto {
   @IsNotEmpty({ message: 'La URL de YouTube es obligatoria' })
@@ -11,4 +17,8 @@ export class CreateSummaryDto {
     },
   )
   youtubeUrl: string;
+
+  @IsOptional()
+  @IsUUID('4', { message: 'El promptId debe ser un UUID v4 válido' })
+  promptId?: string;
 }

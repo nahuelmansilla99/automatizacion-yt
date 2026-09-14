@@ -1,6 +1,7 @@
 import { DataSource } from 'typeorm';
 import * as dotenv from 'dotenv';
 import { VideoSummary } from '../../features/summaries/entities/video-summary.entity';
+import { Prompt } from '../../features/prompts/entities/prompt.entity';
 
 dotenv.config();
 
@@ -11,7 +12,7 @@ export const AppDataSource = new DataSource({
   username: process.env.DATABASE_USER || 'postgres',
   password: process.env.DATABASE_PASSWORD || 'postgres123',
   database: process.env.DATABASE_NAME || 'yt_summaries_db',
-  entities: [VideoSummary],
+  entities: [VideoSummary, Prompt],
   migrations: [__dirname + '/migrations/*{.ts,.js}'],
   synchronize: false,
 });

@@ -6,6 +6,7 @@ import { NotificationsModule } from './features/notifications/notifications.modu
 import { SummariesModule } from './features/summaries/summaries.module';
 import { WebhooksModule } from './features/webhooks/webhooks.module';
 import { MetricsModule } from './features/metrics/metrics.module';
+import { PromptsModule } from './features/prompts/prompts.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { MetricsModule } from './features/metrics/metrics.module';
     SummariesModule,
     WebhooksModule,
     MetricsModule,
+    PromptsModule,
   ],
 })
 export class AppModule {}

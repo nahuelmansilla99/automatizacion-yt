@@ -37,11 +37,18 @@ describe('SupadataMetricsCardComponent', () => {
     // Act
     metricsSignal.set({
       supadata: {
+        organizationId: 'org-123',
         plan: 'Free',
         usedCredits: 25,
         remainingCredits: 75,
         maxCredits: 100,
-        resetDate: '2026-10-01',
+        cachedAt: '2026-09-14T12:00:00.000Z',
+      },
+      summaries: {
+        total: 10,
+        pending: 0,
+        success: 10,
+        error: 0,
       },
     });
 

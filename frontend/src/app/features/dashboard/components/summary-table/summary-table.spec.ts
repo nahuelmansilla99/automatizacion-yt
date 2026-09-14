@@ -25,7 +25,11 @@ describe('SummaryTableComponent', () => {
       youtubeUrl: 'https://youtube.com/watch?v=1',
       videoTitle: 'Introducción a Angular Signals',
       channelName: 'Angular Team',
+      markdownContent: null,
       status: 'SUCCESS',
+      errorMessage: null,
+      promptId: null,
+      promptSnapshot: null,
       createdAt: '2026-09-10T12:00:00.000Z',
       updatedAt: '2026-09-10T12:05:00.000Z',
     },
@@ -80,6 +84,8 @@ describe('SummaryTableComponent', () => {
   });
 
   it('debería invocar store.setFilterStatus al pulsar un filtro', async () => {
+    await fixture.whenStable();
+
     // Act
     const buttons = fixture.nativeElement.querySelectorAll('button');
     const successFilterBtn = Array.from(buttons).find((b: any) =>
@@ -97,6 +103,8 @@ describe('SummaryTableComponent', () => {
   });
 
   it('debería invocar store.openModal al hacer click en Ver Resumen', async () => {
+    await fixture.whenStable();
+
     // Act
     const viewBtn = fixture.nativeElement.querySelector('button[title*="Ver resumen"]') as HTMLButtonElement;
     expect(viewBtn).toBeTruthy();

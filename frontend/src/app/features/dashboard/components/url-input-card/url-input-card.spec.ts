@@ -1,13 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
+import { of } from 'rxjs';
 import { UrlInputCardComponent } from './url-input-card';
 import { SummariesStore } from '../../store/summaries.store';
+import { PromptApiService } from '../../../../core/services/prompt-api.service';
 
 describe('UrlInputCardComponent', () => {
   let component: UrlInputCardComponent;
   let fixture: ComponentFixture<UrlInputCardComponent>;
   let requestSummarySpy: ReturnType<typeof vi.fn>;
   let submittingSignal: ReturnType<typeof signal<boolean>>;
+
+  const mockPromptApi = {
+    getPrompts: vi.fn().mockReturnValue(of({ data: [], total: 0, page: 1, limit: 50, totalPages: 0 })),
+  };
 
   beforeEach(async () => {
     submittingSignal = signal(false);
@@ -22,6 +28,7 @@ describe('UrlInputCardComponent', () => {
       imports: [UrlInputCardComponent],
       providers: [
         { provide: SummariesStore, useValue: mockStore },
+        { provide: PromptApiService, useValue: mockPromptApi },
       ],
     }).compileComponents();
 
@@ -78,6 +85,6 @@ describe('UrlInputCardComponent', () => {
     await fixture.whenStable();
 
     // Assert
-    expect(requestSummarySpy).toHaveBeenCalledWith(validUrl, expect.any(Function));
+    expect(requestSummarySpy).toHaveBeenCalledWith(validUrl, undefined, expect.any(Function));
   });
 });

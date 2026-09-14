@@ -1,0 +1,174 @@
+<!-- Backdrop -->
+<div
+  class="fixed inset-0 z-50 flex items-start justify-center bg-black/70 backdrop-blur-sm p-4 pt-12 overflow-y-auto"
+  (click)="onClose.emit()"
+>
+  <!-- Modal -->
+  <div
+    class="relative w-full max-w-3xl rounded-2xl bg-[var(--dark1)] border border-[var(--dark2)] shadow-2xl mb-12"
+    (click)="$event.stopPropagation()"
+  >
+    <!-- Header -->
+    <div class="flex items-start justify-between px-6 py-4 border-b border-[var(--dark2)]">
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2 flex-wrap">
+          <h2 class="text-lg font-bold text-[var(--light0)] truncate">{{ prompt.name }}</h2>
+          @if (prompt.isDefault) {
+            <span class="px-2 py-0.5 rounded-full bg-[var(--bright-orange)] text-[var(--dark0-hard)] text-xs font-bold">⭐ Default</span>
+          }
+          @if (!prompt.isActive) {
+            <span class="px-2 py-0.5 rounded-full bg-[var(--dark3)] text-[var(--light3)] text-xs">Inactivo</span>
+          }
+        </div>
+        <p class="text-xs text-[var(--light4)] mt-0.5">ID: {{ prompt.id }}</p>
+      </div>
+      <button
+        (click)="onClose.emit()"
+        class="text-[var(--light3)] hover:text-[var(--bright-red)] text-xl transition-colors cursor-pointer ml-4 shrink-0"
+      >✕</button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="flex border-b border-[var(--dark2)] px-6">
+      @for (tab of [
+        {key: 'info', label: '📊 Info'},
+        {key: 'history', label: '📋 Historial (' + totalSummaries() + ')'},
+        {key: 'content', label: '📝 Contenido'}
+      ]; track tab.key) {
+        <button
+          (click)="activeTab.set($any(tab.key))"
+          class="px-4 py-3 text-sm font-medium border-b-2 transition-colors cursor-pointer"
+          [class.border-[var(--bright-orange)]]="activeTab() === tab.key"
+          [class.text-[var(--bright-orange)]]="activeTab() === tab.key"
+          [class.border-transparent]="activeTab() !== tab.key"
+          [class.text-[var(--light3)]]="activeTab() !== tab.key"
+          [class.hover:text-[var(--light1)]]="activeTab() !== tab.key"
+        >
+          {{ tab.label }}
+        </button>
+      }
+    </div>
+
+    <!-- Content -->
+    <div class="p-6">
+
+      <!-- Tab: Info -->
+      @if (activeTab() === 'info') {
+        <div class="space-y-4">
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            <div class="rounded-xl bg-[var(--dark0-hard)] p-4 text-center">
+              <div class="text-3xl font-bold text-[var(--bright-orange)]">{{ prompt.usageCount }}</div>
+              <div class="text-xs text-[var(--light3)] mt-1">Resúmenes generados</div>
+            </div>
+            <div class="rounded-xl bg-[var(--dark0-hard)] p-4 text-center">
+              <div class="text-3xl font-bold text-[var(--bright-aqua)]">{{ prompt.tags.length }}</div>
+              <div class="text-xs text-[var(--light3)] mt-1">Tags</div>
+            </div>
+            <div class="rounded-xl bg-[var(--dark0-hard)] p-4 text-center col-span-2 sm:col-span-1">
+              <div class="text-lg font-bold" [class.text-[var(--bright-green)]]="prompt.isActive" [class.text-[var(--light3)]]="!prompt.isActive">
+                {{ prompt.isActive ? 'Activo' : 'Inactivo' }}
+              </div>
+              <div class="text-xs text-[var(--light3)] mt-1">Estado</div>
+            </div>
+          </div>
+
+          @if (prompt.tags.length > 0) {
+            <div>
+              <p class="text-xs font-semibold text-[var(--light3)] uppercase tracking-wider mb-2">Tags</p>
+              <div class="flex flex-wrap gap-2">
+                @for (tag of prompt.tags; track tag) {
+                  <span class="px-3 py-1 rounded-md bg-[var(--dark2)] text-[var(--bright-aqua)] text-sm font-mono">#{{ tag }}</span>
+                }
+              </div>
+            </div>
+          }
+
+          <div class="text-xs text-[var(--light4)] space-y-1">
+            <p>Creado: <span class="text-[var(--light2)]">{{ prompt.createdAt | date:'dd/MM/yyyy HH:mm' }}</span></p>
+            <p>Última modificación: <span class="text-[var(--light2)]">{{ prompt.updatedAt | date:'dd/MM/yyyy HH:mm' }}</span></p>
+          </div>
+
+          <div class="flex justify-end">
+            <button
+              (click)="onEdit.emit(prompt); onClose.emit()"
+              class="inline-flex items-center gap-2 rounded-lg border border-[var(--bright-yellow)] px-4 py-2 text-sm text-[var(--bright-yellow)] hover:bg-[var(--bright-yellow)] hover:text-[var(--dark0-hard)] transition-colors cursor-pointer"
+            >
+              ✏️ Editar este prompt
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- Tab: Historial -->
+      @if (activeTab() === 'history') {
+        @if (loading()) {
+          <div class="flex justify-center py-10">
+            <svg class="animate-spin h-6 w-6 text-[var(--bright-orange)]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          </div>
+        } @else if (summaries().length === 0) {
+          <div class="text-center py-10">
+            <div class="text-3xl mb-2">📭</div>
+            <p class="text-[var(--light3)]">Este prompt aún no ha sido utilizado en ningún resumen.</p>
+          </div>
+        } @else {
+          <div class="space-y-3">
+            @for (summary of summaries(); track summary.id) {
+              <div class="rounded-lg bg-[var(--dark0-hard)] border border-[var(--dark2)] p-4">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="min-w-0">
+                    <p class="text-sm font-medium text-[var(--light1)] truncate">
+                      {{ summary.videoTitle || 'Sin título' }}
+                    </p>
+                    <p class="text-xs text-[var(--light4)] mt-0.5 truncate">
+                      {{ summary.channelName || 'Canal desconocido' }} · {{ summary.youtubeUrl }}
+                    </p>
+                  </div>
+                  <div class="shrink-0 flex flex-col items-end gap-1">
+                    <span class="text-xs font-medium px-2 py-0.5 rounded-full" [class]="getStatusClass(summary.status)">
+                      {{ getStatusLabel(summary.status) }}
+                    </span>
+                    <span class="text-xs text-[var(--light4)]">{{ summary.createdAt | date:'dd/MM/yy' }}</span>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+
+          <!-- Paginación -->
+          @if (totalPages() > 1) {
+            <div class="flex items-center justify-between mt-4">
+              <button
+                (click)="prevPage()"
+                [disabled]="currentPage() <= 1"
+                class="px-3 py-1.5 text-xs rounded border border-[var(--dark3)] text-[var(--light3)] hover:border-[var(--light3)] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
+              >
+                ← Anterior
+              </button>
+              <span class="text-xs text-[var(--light4)]">
+                Página {{ currentPage() }} de {{ totalPages() }} · {{ totalSummaries() }} resúmenes
+              </span>
+              <button
+                (click)="nextPage()"
+                [disabled]="currentPage() >= totalPages()"
+                class="px-3 py-1.5 text-xs rounded border border-[var(--dark3)] text-[var(--light3)] hover:border-[var(--light3)] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-colors"
+              >
+                Siguiente →
+              </button>
+            </div>
+          }
+        }
+      }
+
+      <!-- Tab: Contenido del Prompt -->
+      @if (activeTab() === 'content') {
+        <div>
+          <pre class="rounded-lg bg-[var(--dark0-hard)] border border-[var(--dark2)] p-4 text-sm text-[var(--light1)] font-mono whitespace-pre-wrap overflow-auto max-h-[60vh]">{{ prompt.content }}</pre>
+        </div>
+      }
+
+    </div>
+  </div>
+</div>
