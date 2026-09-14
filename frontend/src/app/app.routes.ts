@@ -7,6 +7,11 @@ export const routes: Routes = [
       import('./features/dashboard/dashboard').then((m) => m.DashboardComponent),
   },
   {
+    path: 'prompts',
+    loadComponent: () =>
+      import('./features/prompts/prompts').then((m) => m.PromptsComponent),
+  },
+  {
     path: '**',
     redirectTo: '',
   },

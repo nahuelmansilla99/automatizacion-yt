@@ -5,7 +5,10 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   Index,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
+import { Prompt } from '../../../features/prompts/entities/prompt.entity';
 
 export enum SummaryStatus {
   PENDING = 'PENDING',
@@ -44,6 +47,21 @@ export class VideoSummary {
 
   @Column({ type: 'text', nullable: true })
   errorMessage: string | null;
+
+  @Index()
+  @Column({ type: 'uuid', nullable: true })
+  promptId: string | null;
+
+  @ManyToOne(() => Prompt, {
+    nullable: true,
+    onDelete: 'SET NULL',
+    eager: false,
+  })
+  @JoinColumn({ name: 'promptId' })
+  prompt: Prompt | null;
+
+  @Column({ type: 'text', nullable: true })
+  promptSnapshot: string | null;
 
   @Index()
   @CreateDateColumn({ type: 'timestamptz' })

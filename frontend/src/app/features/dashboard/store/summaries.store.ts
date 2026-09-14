@@ -121,9 +121,9 @@ export class SummariesStore {
     });
   }
 
-  requestSummary(youtubeUrl: string, onSuccess?: () => void) {
+  requestSummary(youtubeUrl: string, promptId?: string, onSuccess?: () => void) {
     this._submitting.set(true);
-    this.api.createSummary(youtubeUrl).subscribe({
+    this.api.createSummary(youtubeUrl, promptId).subscribe({
       next: (res) => {
         this._submitting.set(false);
         this.toast.info(

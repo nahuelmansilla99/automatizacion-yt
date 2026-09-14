@@ -43,10 +43,13 @@ export class SummaryApiService {
     return this.http.get<VideoSummary>(`${this.baseUrl}/summaries/${id}`);
   }
 
-  createSummary(youtubeUrl: string): Observable<{ data: VideoSummary; message: string }> {
+  createSummary(youtubeUrl: string, promptId?: string): Observable<{ data: VideoSummary; message: string }> {
+    const body: Record<string, string> = { youtubeUrl };
+    if (promptId) body['promptId'] = promptId;
+
     return this.http.post<{ data: VideoSummary; message: string }>(
       `${this.baseUrl}/summaries`,
-      { youtubeUrl },
+      body,
     );
   }
 

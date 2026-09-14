@@ -5,6 +5,7 @@ import { VideoSummary } from './entities/video-summary.entity';
 import { SummariesService } from './summaries.service';
 import { SummariesController } from './summaries.controller';
 import { NotificationsModule } from '../notifications/notifications.module';
+import { PromptsModule } from '../prompts/prompts.module';
 
 import { TranscriptionService } from './services/transcription.service';
 import { DriveSyncService } from './services/drive-sync.service';
@@ -15,6 +16,7 @@ import { GeminiService } from './services/gemini.service';
     TypeOrmModule.forFeature([VideoSummary]),
     HttpModule,
     NotificationsModule,
+    PromptsModule,
   ],
   controllers: [SummariesController],
   providers: [

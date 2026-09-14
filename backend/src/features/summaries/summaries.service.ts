@@ -13,6 +13,7 @@ import { SummariesGateway } from '../notifications/summaries.gateway';
 import { TranscriptionService } from './services/transcription.service';
 import { GeminiService } from './services/gemini.service';
 import { DriveSyncService } from './services/drive-sync.service';
+import { PromptsService } from '../prompts/prompts.service';
 
 @Injectable()
 export class SummariesService {
@@ -25,11 +26,13 @@ export class SummariesService {
     private readonly transcriptionService: TranscriptionService,
     private readonly geminiService: GeminiService,
     private readonly driveSyncService: DriveSyncService,
+    private readonly promptsService: PromptsService,
   ) {}
 
   async create(createSummaryDto: CreateSummaryDto): Promise<VideoSummary> {
     const summary = this.summariesRepository.create({
       youtubeUrl: createSummaryDto.youtubeUrl,
+      promptId: createSummaryDto.promptId ?? null,
       status: SummaryStatus.PENDING,
     });
 
@@ -37,15 +40,17 @@ export class SummariesService {
     this.gateway.notifySummaryCreated(savedSummary);
 
     // Disparar procesamiento nativo en segundo plano sin bloquear la respuesta HTTP
-    this.executePipeline(savedSummary.id, savedSummary.youtubeUrl).catch(
-      (error: unknown) => {
-        const err = error instanceof Error ? error : new Error(String(error));
-        this.logger.error(
-          `Error no capturado en pipeline para el video ${savedSummary.id}: ${err.message}`,
-          err.stack,
-        );
-      },
-    );
+    this.executePipeline(
+      savedSummary.id,
+      savedSummary.youtubeUrl,
+      createSummaryDto.promptId,
+    ).catch((error: unknown) => {
+      const err = error instanceof Error ? error : new Error(String(error));
+      this.logger.error(
+        `Error no capturado en pipeline para el video ${savedSummary.id}: ${err.message}`,
+        err.stack,
+      );
+    });
 
     return savedSummary;
   }
@@ -98,15 +103,17 @@ export class SummariesService {
 
     this.gateway.notifySummaryUpdated(updated);
 
-    this.executePipeline(updated.id, updated.youtubeUrl).catch(
-      (error: unknown) => {
-        const err = error instanceof Error ? error : new Error(String(error));
-        this.logger.error(
-          `Error no capturado en reintento para el video ${updated.id}: ${err.message}`,
-          err.stack,
-        );
-      },
-    );
+    this.executePipeline(
+      updated.id,
+      updated.youtubeUrl,
+      updated.promptId ?? undefined,
+    ).catch((error: unknown) => {
+      const err = error instanceof Error ? error : new Error(String(error));
+      this.logger.error(
+        `Error no capturado en reintento para el video ${updated.id}: ${err.message}`,
+        err.stack,
+      );
+    });
 
     return updated;
   }
@@ -152,7 +159,11 @@ export class SummariesService {
     };
   }
 
-  async executePipeline(id: string, youtubeUrl: string): Promise<void> {
+  async executePipeline(
+    id: string,
+    youtubeUrl: string,
+    promptId?: string,
+  ): Promise<void> {
     this.logger.log(
       `Iniciando procesamiento nativo para ID: ${id} (${youtubeUrl})`,
     );
@@ -216,14 +227,26 @@ export class SummariesService {
         });
       }
 
-      // 2. Generar resumen estructurado con Gemini
+      // 2. Resolver el prompt (por ID específico o el predeterminado)
+      const resolvedPromptId =
+        promptId ?? currentSummary?.promptId ?? undefined;
+      const prompt = resolvedPromptId
+        ? await this.promptsService.findOne(resolvedPromptId)
+        : await this.promptsService.getActiveDefault();
+
+      this.logger.log(
+        `Usando prompt "${prompt.name}" (ID: ${prompt.id}) para resumen ${id}`,
+      );
+
+      // 3. Generar resumen estructurado con Gemini usando el prompt dinámico
       const markdownContent = await this.geminiService.generateSummary(
         videoTitle,
         channelName,
         transcript,
+        prompt.content,
       );
 
-      // 3. Persistir resultado exitoso
+      // 4. Persistir resultado exitoso
       const summary = await this.summariesRepository.findOne({ where: { id } });
       if (!summary) {
         this.logger.warn(
@@ -238,12 +261,22 @@ export class SummariesService {
       summary.markdownContent = markdownContent;
       summary.status = SummaryStatus.SUCCESS;
       summary.errorMessage = null;
+      summary.promptId = prompt.id;
+      summary.promptSnapshot = prompt.content;
 
       const saved = await this.summariesRepository.save(summary);
       this.logger.log(`Resumen completado exitosamente para ID: ${id}`);
       this.gateway.notifySummaryUpdated(saved);
 
-      // 4. Sincronización secundaria a Google Drive vía n8n (Fire & Forget, no bloquea al usuario)
+      // 5. Incrementar el contador de uso del prompt (Fire & Forget)
+      this.promptsService.incrementUsage(prompt.id).catch((err: unknown) => {
+        const error = err instanceof Error ? err : new Error(String(err));
+        this.logger.warn(
+          `No se pudo incrementar el usageCount del prompt ${prompt.id}: ${error.message}`,
+        );
+      });
+
+      // 6. Sincronización secundaria a Google Drive vía n8n (Fire & Forget, no bloquea al usuario)
       this.driveSyncService
         .syncToDrive({
           id,
@@ -272,9 +305,7 @@ export class SummariesService {
           stack?: string;
         };
         errorMsg =
-          errorObj.response?.data?.message ||
-          errorObj.message ||
-          errorMsg;
+          errorObj.response?.data?.message || errorObj.message || errorMsg;
         stack = errorObj.stack;
       }
 

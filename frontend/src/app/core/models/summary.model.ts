@@ -9,9 +9,12 @@ export interface VideoSummary {
   markdownContent: string | null;
   status: SummaryStatus;
   errorMessage: string | null;
+  promptId: string | null;
+  promptSnapshot: string | null;
   createdAt: string;
   updatedAt: string;
 }
+
 
 export interface SummariesResponse {
   data: VideoSummary[];

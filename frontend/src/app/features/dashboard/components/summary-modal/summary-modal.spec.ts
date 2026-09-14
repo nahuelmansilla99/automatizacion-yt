@@ -19,6 +19,9 @@ describe('SummaryModalComponent', () => {
     channelName: 'Canal Tech',
     markdownContent: '# Resumen\n\nEste es un **resumen** de prueba.',
     status: 'SUCCESS',
+    errorMessage: null,
+    promptId: null,
+    promptSnapshot: null,
     createdAt: '2026-09-10T20:00:00.000Z',
     updatedAt: '2026-09-10T20:05:00.000Z',
   };
