@@ -7,8 +7,8 @@
 #   ./scripts/test-drive-sync.sh [URL_DEL_WEBHOOK] [SECRET]
 #
 # Ejemplos:
-#   ./scripts/test-drive-sync.sh https://n8n.ncodem.com/webhook-test/drive-sync
-#   ./scripts/test-drive-sync.sh https://n8n.ncodem.com/webhook/drive-sync mi_super_secreto_webhook_12345
+#   ./scripts/test-drive-sync.sh https://n8n.tu-dominio.com/webhook-test/drive-sync
+#   ./scripts/test-drive-sync.sh https://n8n.tu-dominio.com/webhook/drive-sync tu_secreto_aqui
 # ==============================================================================
 
 set -euo pipefail
@@ -29,8 +29,8 @@ elif [ -f "${ROOT_DIR}/backend/.env" ]; then
   set +a
 fi
 
-WEBHOOK_URL="${1:-${N8N_DRIVE_WEBHOOK_URL:-https://n8n.ncodem.com/webhook-test/drive-sync}}"
-SECRET="${2:-${WEBHOOK_SECRET:-mi_super_secreto_webhook_12345}}"
+WEBHOOK_URL="${1:-${N8N_DRIVE_WEBHOOK_URL:-http://localhost:5678/webhook-test/drive-sync}}"
+SECRET="${2:-${WEBHOOK_SECRET:-}}"
 
 echo "================================================================"
 echo "Probando Webhook de n8n para Google Drive"

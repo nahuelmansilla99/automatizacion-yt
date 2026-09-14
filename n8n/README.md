@@ -43,8 +43,8 @@ n8n maneja dos URLs para cada Webhook:
 
 | Modo | URL | Cuándo usarla |
 | :--- | :--- | :--- |
-| **Pruebas (Test)** | `https://n8n.ncodem.com/webhook-test/drive-sync` | Cuando haces clic en **"Listen for test event"** en n8n. |
-| **Producción (Active)** | `https://n8n.ncodem.com/webhook/drive-sync` | Cuando activas el workflow (toggle **Active: ON** arriba a la derecha). |
+| **Pruebas (Test)** | `https://n8n.tu-dominio.com/webhook-test/drive-sync` | Cuando haces clic en **"Listen for test event"** en n8n. |
+| **Producción (Active)** | `https://n8n.tu-dominio.com/webhook/drive-sync` | Cuando activas el workflow (toggle **Active: ON** arriba a la derecha). |
 | **Red interna Dokploy** | `http://n8n:5678/webhook/drive-sync` | Comunicación interna entre contenedores dentro de la misma red Docker. |
 
 ---
@@ -55,10 +55,10 @@ En tu archivo `.env` (y en `backend/.env`):
 
 ```env
 # URL de producción de n8n
-N8N_DRIVE_WEBHOOK_URL=https://n8n.ncodem.com/webhook/drive-sync
+N8N_DRIVE_WEBHOOK_URL=https://n8n.tu-dominio.com/webhook/drive-sync
 
 # Clave secreta enviada en la cabecera X-Webhook-Secret
-WEBHOOK_SECRET=mi_super_secreto_webhook_12345
+WEBHOOK_SECRET=tu_secreto_seguro_aqui
 ```
 
 ---
@@ -69,10 +69,10 @@ WEBHOOK_SECRET=mi_super_secreto_webhook_12345
 Puedes ejecutar el script incluido:
 ```bash
 # Probar contra el webhook de test de n8n:
-./scripts/test-drive-sync.sh https://n8n.ncodem.com/webhook-test/drive-sync
+./scripts/test-drive-sync.sh https://n8n.tu-dominio.com/webhook-test/drive-sync
 
 # Probar contra el webhook activo de producción:
-./scripts/test-drive-sync.sh https://n8n.ncodem.com/webhook/drive-sync
+./scripts/test-drive-sync.sh https://n8n.tu-dominio.com/webhook/drive-sync tu_secreto_aqui
 ```
 
 ### Opción B: Desde la Aplicación Web (Frontend / API)

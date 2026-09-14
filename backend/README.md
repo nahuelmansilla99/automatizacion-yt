@@ -138,7 +138,7 @@ GEMINI_API_KEY=tu_clave_gemini
 GEMINI_MODEL=gemini-2.5-flash
 
 # Integración n8n (Google Drive micro-worker)
-N8N_DRIVE_WEBHOOK_URL=https://n8n.ncodem.com/webhook/drive-sync
+N8N_DRIVE_WEBHOOK_URL=https://n8n.tu-dominio.com/webhook/drive-sync
 WEBHOOK_SECRET=tu_secreto_compartido
 ```
 

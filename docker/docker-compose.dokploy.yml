@@ -4,15 +4,15 @@ services:
     container_name: yt-summary-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ${DATABASE_USER:-yt_user}
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-yt_secure_password_123}
-      POSTGRES_DB: ${DATABASE_NAME:-yt_summaries_db}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
     volumes:
       - yt_summary_postgres_data:/var/lib/postgresql/data
     networks:
       - dokploy-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER:-yt_user} -d ${DATABASE_NAME:-yt_summaries_db}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER} -d ${DATABASE_NAME}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -31,9 +31,9 @@ services:
       PORT: 3000
       DATABASE_HOST: postgres
       DATABASE_PORT: 5432
-      DATABASE_USER: ${DATABASE_USER:-yt_user}
-      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-yt_secure_password_123}
-      DATABASE_NAME: ${DATABASE_NAME:-yt_summaries_db}
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_NAME: ${DATABASE_NAME}
       N8N_WEBHOOK_URL: ${N8N_WEBHOOK_URL}
       WEBHOOK_SECRET: ${WEBHOOK_SECRET}
       SUPADATA_API_KEY: ${SUPADATA_API_KEY}
