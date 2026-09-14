@@ -35,6 +35,7 @@ backend/src/
 │   │   └── migrations/
 │   │       ├── 1789051606168-InitialSchema.ts
 │   │       ├── 1789051700000-AddTranscriptColumn.ts
+│   │       ├── 1789052000000-CreatePromptsTable.ts
 │   │       └── index.ts                # Registro centralizado de migraciones
 │   ├── filters/all-exceptions.filter.ts
 │   └── guards/webhook-secret.guard.ts
@@ -50,6 +51,12 @@ backend/src/
 │   │   ├── summaries.controller.ts     # Endpoints REST
 │   │   └── summaries.service.ts        # Orquestador del pipeline asíncrono y reintentos
 │   │
+│   ├── prompts/                        # Módulo de administración de prompts
+│   │   ├── dto/                        # DTOs de creación, actualización y filtrado
+│   │   ├── entities/prompt.entity.ts   # Entidad TypeORM Prompt
+│   │   ├── prompts.controller.ts       # Endpoints REST del CRUD de prompts
+│   │   └── prompts.service.ts          # Lógica de negocio, gestión de defaults y métricas de uso
+│   │
 │   ├── metrics/                        # Métricas globales y cuota de Supadata
 │   │   ├── metrics.controller.ts
 │   │   └── metrics.service.ts
@@ -64,8 +71,55 @@ backend/src/
 
 ---
 
-## 🗄️ Esquema de Base de Datos (`video_summaries`)
+## 🗄️ Esquema de Base de Datos y Entidades
 
+El modelo de datos cuenta con **2 entidades principales** relacionadas entre sí mediante clave foránea no destructiva (`ON DELETE SET NULL`):
+
+```mermaid
+erDiagram
+    prompts ||--o{ video_summaries : "1:N (genera resúmenes)"
+
+    prompts {
+        uuid id PK "uuid_generate_v4()"
+        varchar name "Nombre legible (Indexado)"
+        text content "Plantilla de directivas para el LLM"
+        varchar_array tags "Tags de clasificación ej: {obsidian,pkm}"
+        boolean isDefault "Indica si es el prompt predeterminado (Indexado)"
+        boolean isActive "Indica si está activo para usarse (Indexado)"
+        integer usageCount "Contador de usos acumulados"
+        timestamptz createdAt "Fecha de creación"
+        timestamptz updatedAt "Fecha de actualización"
+    }
+
+    video_summaries {
+        uuid id PK "uuid_generate_v4()"
+        varchar youtubeUrl "URL del video de YouTube (Indexado)"
+        varchar videoTitle "Título del video"
+        varchar channelName "Nombre del canal"
+        text transcript "Transcripción completa (Caché local)"
+        text markdownContent "Resumen en Markdown para Obsidian"
+        enum status "PENDING | SUCCESS | ERROR (Indexado)"
+        text errorMessage "Detalle del error en caso de fallo"
+        uuid promptId FK "FK a prompts.id (ON DELETE SET NULL, Indexado)"
+        text promptSnapshot "Copia exacta inmutable del prompt usado"
+        timestamptz createdAt "Fecha de creación (Indexado DESC)"
+        timestamptz updatedAt "Fecha de actualización"
+    }
+```
+
+### Tabla `prompts`
+| Campo | Tipo | Descripción |
+| :--- | :--- | :--- |
+| `id` | `uuid` (PK) | Identificador único (`uuid_generate_v4()`). |
+| `name` | `varchar(255)` | Nombre identificatorio del prompt (indexado). |
+| `content` | `text` | Contenido de la directiva y reglas de síntesis para Gemini. |
+| `tags` | `varchar[]` | Array nativo de etiquetas de categorización. |
+| `isDefault` | `boolean` | Flag de prompt predeterminado del sistema (indexado). |
+| `isActive` | `boolean` | Flag para habilitar o inhabilitar el prompt (indexado). |
+| `usageCount` | `integer` | Contador automático de resúmenes generados con este prompt. |
+| `createdAt` / `updatedAt` | `timestamptz` | Marcas temporales de auditoría. |
+
+### Tabla `video_summaries`
 | Campo | Tipo | Descripción |
 | :--- | :--- | :--- |
 | `id` | `uuid` (PK) | Identificador único generado con `uuid_generate_v4()`. |
@@ -74,9 +128,11 @@ backend/src/
 | `channelName` | `varchar(255)` | Nombre del canal o autor. |
 | `transcript` | `text` (nullable) | Transcripción completa almacenada para evitar re-consultas a Supadata. |
 | `markdownContent`| `text` (nullable) | Contenido del resumen en formato Markdown para Obsidian. |
-| `status` | `enum` | Estado del procesamiento: `PENDING`, `SUCCESS`, `ERROR`. |
+| `status` | `enum` | Estado del procesamiento: `PENDING`, `SUCCESS`, `ERROR` (indexado). |
 | `errorMessage` | `text` (nullable) | Mensaje detallado del error en caso de fallo. |
-| `createdAt` | `timestamptz` | Fecha de creación del registro. |
+| `promptId` | `uuid` (FK, nullable) | Referencia al prompt utilizado (`ON DELETE SET NULL`, indexado). |
+| `promptSnapshot` | `text` (nullable) | **Copia histórica inmutable** del prompt exacto usado en la síntesis. |
+| `createdAt` | `timestamptz` | Fecha de creación del registro (indexado DESC). |
 | `updatedAt` | `timestamptz` | Fecha de última actualización. |
 
 ---
@@ -87,7 +143,8 @@ Las migraciones se ejecutan automáticamente al iniciar el servidor (`migrations
 
 Historial de migraciones:
 1. `1789051606168-InitialSchema`: Crea la extensión `uuid-ossp`, el tipo ENUM de estados, la tabla `video_summaries` y sus índices.
-2. `1789051700000-AddTranscriptColumn`: Agrega la columna `transcript` a la tabla `video_summaries`.
+2. `1789051700000-AddTranscriptColumn`: Agrega la columna `transcript` a la tabla `video_summaries` para la estrategia de caché y reintentos sin costo de Supadata.
+3. `1789052000000-CreatePromptsTable`: Crea la tabla `prompts` con sus índices, vincula `promptId` y `promptSnapshot` en `video_summaries` e inserta el prompt seed por defecto.
 
 ---
 
@@ -95,7 +152,7 @@ Historial de migraciones:
 
 ### Resúmenes (`/api/summaries`)
 * **`POST /api/summaries`**
-  - **Body:** `{ "youtubeUrl": "https://www.youtube.com/watch?v=..." }`
+  - **Body:** `{ "youtubeUrl": "https://www.youtube.com/watch?v=...", "promptId": "uuid-opcional" }`
   - **Respuesta (202 Accepted):** Retorna el registro inicial en estado `PENDING` y arranca el procesamiento en segundo plano.
 * **`GET /api/summaries`**
   - **Query params:** `page` (default: 1), `limit` (default: 10), `status`, `search`.
@@ -108,6 +165,24 @@ Historial de migraciones:
   - Fuerza la sincronización manual del archivo `.md` con Google Drive vía n8n.
 * **`DELETE /api/summaries/:id`**
   - Elimina el resumen de la base de datos y emite notificación WebSocket.
+
+### Prompts (`/api/prompts`)
+* **`GET /api/prompts`**
+  - **Query params:** `page`, `limit`, `search`, `tag`, `isActive`, `isDefault`.
+  - Retorna listado paginado ordenado con el predeterminado primero.
+* **`POST /api/prompts`**
+  - **Body:** `{ "name": "...", "content": "...", "tags": ["tag1"], "isDefault": false, "isActive": true }`
+  - Crea una nueva plantilla de prompt. Si se marca como default, desmarca automáticamente el anterior.
+* **`GET /api/prompts/:id`**
+  - Retorna el detalle y contenido de un prompt específico.
+* **`PATCH /api/prompts/:id`**
+  - Actualiza nombre, contenido, tags o estados de un prompt.
+* **`DELETE /api/prompts/:id`**
+  - Elimina el prompt (bloqueado si está configurado como predeterminado).
+* **`POST /api/prompts/:id/default`**
+  - Establece el prompt como el predeterminado global del sistema.
+* **`GET /api/prompts/:id/summaries`**
+  - Lista paginada de todos los resúmenes generados con este prompt.
 
 ### Métricas (`/api/metrics`)
 * **`GET /api/metrics`**
