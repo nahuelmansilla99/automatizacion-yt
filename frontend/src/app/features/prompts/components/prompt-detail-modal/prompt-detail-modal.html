@@ -14,7 +14,7 @@
         <div class="flex items-center gap-2 flex-wrap">
           <h2 class="text-lg font-bold text-[var(--light0)] truncate">{{ prompt.name }}</h2>
           @if (prompt.isDefault) {
-            <span class="px-2 py-0.5 rounded-full bg-[var(--bright-orange)] text-[var(--dark0-hard)] text-xs font-bold">⭐ Default</span>
+            <span class="px-2 py-0.5 rounded-full bg-[var(--bright-orange)] text-[var(--dark0-hard)] text-xs font-bold">Default</span>
           }
           @if (!prompt.isActive) {
             <span class="px-2 py-0.5 rounded-full bg-[var(--dark3)] text-[var(--light3)] text-xs">Inactivo</span>
@@ -31,9 +31,9 @@
     <!-- Tabs -->
     <div class="flex border-b border-[var(--dark2)] px-6">
       @for (tab of [
-        {key: 'info', label: '📊 Info'},
-        {key: 'history', label: '📋 Historial (' + totalSummaries() + ')'},
-        {key: 'content', label: '📝 Contenido'}
+        {key: 'info', label: 'Info'},
+        {key: 'history', label: 'Historial (' + totalSummaries() + ')'},
+        {key: 'content', label: 'Contenido'}
       ]; track tab.key) {
         <button
           (click)="activeTab.set($any(tab.key))"
@@ -93,7 +93,7 @@
               (click)="onEdit.emit(prompt); onClose.emit()"
               class="inline-flex items-center gap-2 rounded-lg border border-[var(--bright-yellow)] px-4 py-2 text-sm text-[var(--bright-yellow)] hover:bg-[var(--bright-yellow)] hover:text-[var(--dark0-hard)] transition-colors cursor-pointer"
             >
-              ✏️ Editar este prompt
+              Editar este prompt
             </button>
           </div>
         </div>

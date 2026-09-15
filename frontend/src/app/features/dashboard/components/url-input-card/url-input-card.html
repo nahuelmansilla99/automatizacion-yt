@@ -1,13 +1,9 @@
 <div class="rounded-xl bg-[var(--dark1)] border border-[var(--dark2)] p-5 sm:p-6 shadow-lg">
   <div class="flex items-center gap-2 mb-2">
-    <span class="text-xl">⚡</span>
     <h2 class="text-base sm:text-lg font-bold text-[var(--light0)]">
       Nuevo Resumen de YouTube
     </h2>
   </div>
-  <p class="text-xs sm:text-sm text-[var(--light2)] mb-4">
-    Ingresa el enlace de cualquier video de YouTube. n8n extraerá el audio, transcribirá con Supadata, generará el resumen con Gemini LLM y lo guardará en tu Google Drive para Obsidian.
-  </p>
 
   <form (submit)="onSubmit($event)" class="flex flex-col gap-3">
 
@@ -59,7 +55,7 @@
     @if (prompts().length > 0) {
       <div class="flex items-center gap-3">
         <span class="text-xs text-[var(--light3)] shrink-0 flex items-center gap-1">
-          <span>🧠</span> Prompt:
+          Prompt seleccionado:
         </span>
         <select
           name="promptId"

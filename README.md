@@ -6,11 +6,12 @@ Plataforma integral para automatizar la extracción, transcripción y resumen de
 
 ## 🏛️ Arquitectura del Sistema
 
-* **Frontend:** Angular v21 (Standalone components, Signals, Reactive State Store, Tailwind CSS v4 con paleta Obsidian Gruvbox).
+* **Frontend:** Angular v21 (Standalone components, Signals, Reactive State Store, Tailwind CSS v4 con paleta Obsidian Gruvbox, selector y administrador de prompts).
 * **Backend:** NestJS 11 (TypeORM con PostgreSQL, WebSockets con Socket.IO para notificaciones en vivo, validación estricta con class-validator).
   * **Pipeline Nativo:** Extracción vía YouTube oEmbed, transcripción vía Supadata Transcript API y síntesis con Google Gemini (`@google/genai`).
+  * **Gestor de Prompts Dinámico:** Selección de plantillas personalizadas, tags, fallback a prompt predeterminado y congelamiento de snapshots inmutables por cada resumen.
   * **Persistencia Temprana y Caché de Transcripciones:** El texto de la transcripción se guarda de inmediato en PostgreSQL. En caso de reintentar tras un fallo de la IA o al ingresar una URL previamente analizada, se reutiliza el texto existente sin gastar tokens extra de Supadata.
-* **Base de Datos:** PostgreSQL 16 aislado con volumen persistente dedicado y migraciones versionadas automáticas.
+* **Base de Datos:** PostgreSQL 16 con entidades `VideoSummary` y `Prompt`, claves foráneas no destructivas, volumen persistente dedicado y migraciones versionadas automáticas.
 * **Automatización Secundaria:** Micro-worker en n8n para la sincronización de archivos Markdown en Google Drive (Obsidian) en modo *Fire & Forget*.
 * **Infraestructura y Red:** VPS con Dokploy, Cloudflare Tunnels y capa de seguridad Zero Trust (Cloudflare Access con One-Time PIN) en `resumen.ncodem.com`.
 

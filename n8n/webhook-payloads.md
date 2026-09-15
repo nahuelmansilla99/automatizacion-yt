@@ -32,7 +32,7 @@ Cuando el flujo de n8n finaliza con éxito (obtiene metadatos, transcript, resum
 * **Método:** `POST`
 * **URL:**
   * En red interna de Dokploy: `http://backend:3000/api/webhooks/n8n-success`
-  * O vía dominio público: `https://resumen.ncodem.com/api/webhooks/n8n-success`
+  * O vía dominio público: `https://resumen.tu-dominio.com/api/webhooks/n8n-success`
 * **Headers:**
   ```http
   Content-Type: application/json
@@ -64,7 +64,7 @@ Si algún nodo en n8n falla (ej. timeout en Supadata, error en la IA de Gemini, 
 * **Método:** `POST`
 * **URL:**
   * En red interna de Dokploy: `http://backend:3000/api/webhooks/n8n-error`
-  * O vía dominio público: `https://resumen.ncodem.com/api/webhooks/n8n-error`
+  * O vía dominio público: `https://resumen.tu-dominio.com/api/webhooks/n8n-error`
 * **Headers:**
   ```http
   Content-Type: application/json
