@@ -7,7 +7,6 @@
   </div>
 } @else if (prompts.length === 0) {
   <div class="rounded-xl bg-[var(--dark1)] border border-[var(--dark2)] p-12 text-center">
-    <div class="text-4xl mb-3">🧠</div>
     <p class="text-[var(--light2)] font-medium">No hay prompts configurados</p>
     <p class="text-[var(--light3)] text-sm mt-1">Crea tu primer prompt para personalizar los resúmenes de IA.</p>
   </div>
@@ -30,7 +29,7 @@
 
               @if (prompt.isDefault) {
                 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--bright-orange)] text-[var(--dark0-hard)] text-xs font-bold">
-                  ⭐ Predeterminado
+                  Predeterminado
                 </span>
               }
               @if (!prompt.isActive) {
@@ -59,7 +58,6 @@
             <!-- Estadísticas -->
             <div class="flex items-center gap-4 text-xs text-[var(--light4)]">
               <span class="flex items-center gap-1">
-                <span>📊</span>
                 Usado en <strong class="text-[var(--light2)]">{{ prompt.usageCount }}</strong> resúmenes
               </span>
               <span>·</span>
@@ -74,7 +72,7 @@
               title="Ver historial"
               class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-[var(--dark3)] px-3 py-2 text-xs text-[var(--light2)] hover:border-[var(--bright-aqua)] hover:text-[var(--bright-aqua)] transition-colors cursor-pointer"
             >
-              📋 Historial
+              Historial
             </button>
 
             <button
@@ -82,7 +80,7 @@
               title="Editar prompt"
               class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-[var(--dark3)] px-3 py-2 text-xs text-[var(--light2)] hover:border-[var(--bright-yellow)] hover:text-[var(--bright-yellow)] transition-colors cursor-pointer"
             >
-              ✏️ Editar
+              Editar
             </button>
 
             @if (!prompt.isDefault) {
@@ -91,7 +89,7 @@
                 title="Establecer como predeterminado"
                 class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-[var(--dark3)] px-3 py-2 text-xs text-[var(--light2)] hover:border-[var(--bright-orange)] hover:text-[var(--bright-orange)] transition-colors cursor-pointer"
               >
-                ⭐ Default
+                Default
               </button>
             }
 
@@ -99,9 +97,9 @@
               (click)="onToggleActive.emit(prompt)"
               title="{{ prompt.isActive ? 'Desactivar' : 'Activar' }}"
               class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-[var(--dark3)] px-3 py-2 text-xs transition-colors cursor-pointer"
-              [class.text-[var(--bright-green)]]="prompt.isActive"
+              [class.text-[var(--bright-red)]]="prompt.isActive"
               [class.hover:border-[var(--bright-red)]]="prompt.isActive"
-              [class.text-[var(--light3)]]="!prompt.isActive"
+              [class.text-[var(--bright-green)]]="!prompt.isActive"
               [class.hover:border-[var(--bright-green)]]="!prompt.isActive"
             >
               {{ prompt.isActive ? '⏸ Desactivar' : '▶ Activar' }}
@@ -113,7 +111,7 @@
                 title="Eliminar prompt"
                 class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-[var(--dark3)] px-3 py-2 text-xs text-[var(--light3)] hover:border-[var(--bright-red)] hover:text-[var(--bright-red)] transition-colors cursor-pointer"
               >
-                🗑 Eliminar
+                Eliminar
               </button>
             }
           </div>
