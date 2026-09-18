@@ -1,195 +1,178 @@
-<div class="rounded-xl bg-[var(--background-primary)] p-5 sm:p-6">
-  <!-- Barra Superior: Filtros y Búsqueda -->
-  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-    <!-- Píldoras de Filtro de Estado -->
-    <div class="flex flex-wrap items-center gap-2">
+<section class="flex flex-col gap-4 font-mono">
+  <!-- Encabezado de Sección -->
+  <h2 class="terminal-divider text-xs sm:text-sm text-[var(--terminal-dim)]">
+    ── HISTORIAL_RESUMENES ───────────────────────────────────────────────────────────
+  </h2>
+
+  <!-- Barra Superior: Filtros y Búsqueda estilo Terminal -->
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
+    <!-- Píldoras/Links de Filtro de Estado -->
+    <div class="flex flex-wrap items-center gap-1 sm:gap-2">
       <button
         (click)="store.setFilterStatus('ALL')"
-        class="rounded-lg px-3 py-1.5 text-xs font-semibold cursor-pointer transition-all border"
-        [class.bg-[var(--dark2)]]="store.filterStatus() === 'ALL'"
-        [class.text-[var(--light0)]]="store.filterStatus() === 'ALL'"
-        [class.border-[var(--light3)]]="store.filterStatus() === 'ALL'"
-        [class.bg-[var(--dark0-hard)]]="store.filterStatus() !== 'ALL'"
-        [class.text-[var(--light2)]]="store.filterStatus() !== 'ALL'"
-        [class.border-[var(--dark2)]]="store.filterStatus() !== 'ALL'"
+        class="px-2 py-1 text-xs uppercase cursor-pointer transition-colors"
+        [class.bg-[var(--terminal-bright)]]="store.filterStatus() === 'ALL'"
+        [class.text-black]="store.filterStatus() === 'ALL'"
+        [class.font-bold]="store.filterStatus() === 'ALL'"
+        [class.text-[var(--terminal-base)]]="store.filterStatus() !== 'ALL'"
+        [class.hover:text-[var(--terminal-bright)]]="store.filterStatus() !== 'ALL'"
       >
-        Todos ({{ store.totalVideos() }})
+        [ TODOS({{ store.totalVideos() }}) ]
       </button>
 
       <button
         (click)="store.setFilterStatus('SUCCESS')"
-        class="rounded-lg px-3 py-1.5 text-xs font-semibold cursor-pointer transition-all border"
-        [class.bg-[rgba(184,187,38,0.25)]]="store.filterStatus() === 'SUCCESS'"
-        [class.text-[var(--bright-green)]]="store.filterStatus() === 'SUCCESS'"
-        [class.border-[var(--bright-green)]]="store.filterStatus() === 'SUCCESS'"
-        [class.bg-[var(--dark0-hard)]]="store.filterStatus() !== 'SUCCESS'"
-        [class.text-[var(--light2)]]="store.filterStatus() !== 'SUCCESS'"
-        [class.border-[var(--dark2)]]="store.filterStatus() !== 'SUCCESS'"
+        class="px-2 py-1 text-xs uppercase cursor-pointer transition-colors"
+        [class.bg-[var(--terminal-bright)]]="store.filterStatus() === 'SUCCESS'"
+        [class.text-black]="store.filterStatus() === 'SUCCESS'"
+        [class.font-bold]="store.filterStatus() === 'SUCCESS'"
+        [class.text-[var(--terminal-base)]]="store.filterStatus() !== 'SUCCESS'"
+        [class.hover:text-[var(--terminal-bright)]]="store.filterStatus() !== 'SUCCESS'"
       >
-        Completados ({{ store.completados() }})
+        [ ● COMPLETADOS({{ store.completados() }}) ]
       </button>
 
       <button
         (click)="store.setFilterStatus('PENDING')"
-        class="rounded-lg px-3 py-1.5 text-xs font-semibold cursor-pointer transition-all border"
-        [class.bg-[rgba(250,189,47,0.25)]]="store.filterStatus() === 'PENDING'"
-        [class.text-[var(--bright-yellow)]]="store.filterStatus() === 'PENDING'"
-        [class.border-[var(--bright-yellow)]]="store.filterStatus() === 'PENDING'"
-        [class.bg-[var(--dark0-hard)]]="store.filterStatus() !== 'PENDING'"
-        [class.text-[var(--light2)]]="store.filterStatus() !== 'PENDING'"
-        [class.border-[var(--dark2)]]="store.filterStatus() !== 'PENDING'"
+        class="px-2 py-1 text-xs uppercase cursor-pointer transition-colors"
+        [class.bg-[var(--terminal-bright)]]="store.filterStatus() === 'PENDING'"
+        [class.text-black]="store.filterStatus() === 'PENDING'"
+        [class.font-bold]="store.filterStatus() === 'PENDING'"
+        [class.text-[var(--terminal-base)]]="store.filterStatus() !== 'PENDING'"
+        [class.hover:text-[var(--terminal-bright)]]="store.filterStatus() !== 'PENDING'"
       >
-        Procesando ({{ store.pendientes() }})
+        [ ◌ PROCESANDO({{ store.pendientes() }}) ]
       </button>
 
       <button
         (click)="store.setFilterStatus('ERROR')"
-        class="rounded-lg px-3 py-1.5 text-xs font-semibold cursor-pointer transition-all border"
-        [class.bg-[rgba(251,73,52,0.25)]]="store.filterStatus() === 'ERROR'"
-        [class.text-[var(--bright-red)]]="store.filterStatus() === 'ERROR'"
-        [class.border-[var(--bright-red)]]="store.filterStatus() === 'ERROR'"
-        [class.bg-[var(--dark0-hard)]]="store.filterStatus() !== 'ERROR'"
-        [class.text-[var(--light2)]]="store.filterStatus() !== 'ERROR'"
-        [class.border-[var(--dark2)]]="store.filterStatus() !== 'ERROR'"
+        class="px-2 py-1 text-xs uppercase cursor-pointer transition-colors"
+        [class.bg-[var(--terminal-bright)]]="store.filterStatus() === 'ERROR'"
+        [class.text-black]="store.filterStatus() === 'ERROR'"
+        [class.font-bold]="store.filterStatus() === 'ERROR'"
+        [class.text-[var(--terminal-base)]]="store.filterStatus() !== 'ERROR'"
+        [class.hover:text-[var(--terminal-bright)]]="store.filterStatus() !== 'ERROR'"
       >
-        Con Error ({{ store.conError() }})
+        [ ✕ ERROR({{ store.conError() }}) ]
       </button>
     </div>
 
-    <!-- Buscador -->
-    <div class="relative w-full md:w-72">
+    <!-- Buscador Terminal -->
+    <div class="flex items-center gap-1 w-full md:w-64 border-b border-[var(--terminal-border)] pb-1">
+      <span class="text-[var(--terminal-dim)]">&gt;</span>
       <input
         type="text"
         [ngModel]="store.searchQuery()"
         (ngModelChange)="store.setSearchQuery($event)"
-        placeholder="Buscar por título, canal o URL..."
-        class="w-full rounded-lg bg-[var(--dark0-hard)] border border-[var(--dark2)] px-3.5 py-2 text-xs text-[var(--light0)] placeholder-[var(--dark4)] focus:border-[var(--bright-orange)] focus:outline-none transition-colors"
+        placeholder="buscar..."
+        class="w-full bg-transparent text-xs text-[var(--terminal-bright)] placeholder-[var(--terminal-dim)] focus:outline-none font-mono uppercase"
       />
       @if (store.searchQuery()) {
         <button
           (click)="store.setSearchQuery('')"
-          class="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--light3)] hover:text-[var(--light0)] text-xs cursor-pointer"
+          class="text-xs text-[var(--terminal-dim)] hover:text-[var(--terminal-bright)] px-1 cursor-pointer"
+          title="Limpiar búsqueda"
         >
-          ✕
+          [X]
         </button>
       }
     </div>
   </div>
 
-  <!-- Tabla de Resúmenes -->
-  <div class="overflow-x-auto rounded-lg border border-[var(--dark2)]">
-    <table class="w-full text-left border-collapse">
-      <thead>
-        <tr class="border-b border-[var(--dark2)] bg-[var(--dark0-hard)] text-xs font-bold text-[var(--light2)] uppercase tracking-wider">
-          <th class="p-3.5 sm:p-4">Video & Canal</th>
-          <th class="p-3.5 sm:p-4">Fecha</th>
-          <th class="p-3.5 sm:p-4">Estado</th>
-          <th class="p-3.5 sm:p-4 text-right">Acciones</th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-[var(--dark2)] text-xs">
-        @for (video of store.filteredVideos(); track video.id) {
-          <tr class="hover:bg-[rgba(255,255,255,0.02)] transition-colors">
-            <!-- Video / Canal -->
-            <td class="p-3.5 sm:p-4 max-w-xs sm:max-w-md">
-              <div class="font-bold text-[var(--light0)] truncate">
-                {{ video.videoTitle || 'Procesando información del video...' }}
-              </div>
-              <div class="flex items-center gap-2 mt-1 text-[var(--light3)] truncate">
-                @if (video.channelName) {
-                  <span class="text-[var(--bright-aqua)] truncate">{{ video.channelName }}</span>
-                  <span>•</span>
-                }
-                <a
-                  [href]="video.youtubeUrl"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="text-[var(--bright-blue)] hover:underline truncate"
-                  title="Ver video original"
-                >
-                  {{ video.youtubeUrl }}
-                </a>
-              </div>
-            </td>
+  <!-- Lista de Resúmenes estilo basement (Text list) -->
+  <div class="mt-2 flex flex-col divide-y divide-[var(--terminal-border)] border-t border-b border-[var(--terminal-border)]">
+    @for (video of store.filteredVideos(); track video.id) {
+      <div class="py-3 flex flex-col gap-2 hover:bg-[rgba(255,102,0,0.03)] transition-colors">
+        <!-- Fila superior: Título e hipervínculo -->
+        <div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
+          <div class="flex items-baseline gap-2 min-w-0">
+            <span class="text-[var(--terminal-dim)] shrink-0">-</span>
+            <span class="font-bold text-[var(--terminal-bright)] truncate text-xs sm:text-sm uppercase">
+              {{ video.videoTitle || 'PROCESANDO_METADATA_VIDEO...' }}
+            </span>
+          </div>
 
-            <!-- Fecha -->
-            <td class="p-3.5 sm:p-4 whitespace-nowrap text-[var(--light2)]">
-              {{ video.createdAt | date: 'dd/MM/yyyy HH:mm' }}
-            </td>
+          <!-- Estado -->
+          <div class="shrink-0">
+            <app-status-badge [status]="video.status" />
+          </div>
+        </div>
 
-            <!-- Estado -->
-            <td class="p-3.5 sm:p-4 whitespace-nowrap">
-              <app-status-badge [status]="video.status" />
-            </td>
+        <!-- Fila intermedia: metadata -->
+        <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[var(--terminal-dim)] pl-4">
+          @if (video.channelName) {
+            <span class="text-[var(--terminal-base)] uppercase">{{ video.channelName }}</span>
+            <span>::</span>
+          }
+          <span>{{ video.createdAt | date: 'yyyy-MM-dd HH:mm' }}</span>
+          <span>::</span>
+          <a
+            [href]="video.youtubeUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-[var(--terminal-dim)] hover:text-[var(--terminal-bright)] underline truncate max-w-xs"
+            title="Abrir URL original"
+          >
+            {{ video.youtubeUrl }}
+          </a>
+        </div>
 
-            <!-- Acciones -->
-            <td class="p-3.5 sm:p-4 whitespace-nowrap text-right">
-              <div class="flex items-center justify-end gap-2">
-                @if (video.status === 'SUCCESS') {
-                  <button
-                    (click)="store.openModal(video)"
-                    class="flex items-center gap-1 rounded-md bg-[var(--bright-orange)] hover:brightness-110 text-[var(--dark0-hard)] px-2.5 py-1.5 font-bold cursor-pointer transition-all shadow-sm"
-                    title="Ver resumen en formato Markdown"
-                  >
-                    <span>Ver Resumen</span>
-                  </button>
-                }
+        <!-- Fila de acciones -->
+        <div class="flex items-center gap-2 pl-4 pt-1 text-xs">
+          @if (video.status === 'SUCCESS') {
+            <button
+              (click)="store.openModal(video)"
+              class="text-[var(--terminal-bright)] hover:underline font-bold cursor-pointer uppercase"
+              title="Ver resumen en formato Markdown"
+            >
+              [ VER_RESUMEN ]
+            </button>
+          }
 
-                @if (video.status === 'ERROR') {
-                  <button
-                    (click)="store.openErrorModal(video)"
-                    class="flex items-center gap-1 rounded-md bg-[rgba(251,73,52,0.15)] hover:bg-[rgba(251,73,52,0.25)] text-[var(--bright-red)] border border-[rgba(251,73,52,0.3)] px-2.5 py-1.5 font-semibold cursor-pointer transition-all"
-                    title="Ver motivo del fallo"
-                  >
-                    <span>⚠ Ver Error</span>
-                  </button>
+          @if (video.status === 'ERROR') {
+            <button
+              (click)="store.openErrorModal(video)"
+              class="text-[var(--terminal-error)] hover:underline font-bold cursor-pointer uppercase"
+              title="Ver detalle del error"
+            >
+              [ ! VER_ERROR ]
+            </button>
 
-                  <button
-                    (click)="store.retry(video.id)"
-                    class="flex items-center gap-1 rounded-md bg-[var(--dark0-hard)] hover:bg-[var(--dark2)] text-[var(--bright-yellow)] border border-[var(--dark2)] px-2.5 py-1.5 font-semibold cursor-pointer transition-all"
-                    title="Reintentar proceso en n8n"
-                  >
-                    <span>🔄 Reintentar</span>
-                  </button>
-                }
+            <button
+              (click)="store.retry(video.id)"
+              class="text-[var(--terminal-warn)] hover:underline cursor-pointer uppercase"
+              title="Reintentar proceso en n8n"
+            >
+              [ ↻ REINTENTAR ]
+            </button>
+          }
 
-                <button
-                  (click)="copyUrl(video.youtubeUrl)"
-                  class="rounded-md bg-[var(--dark0-hard)] hover:bg-[var(--dark2)] text-[var(--light3)] hover:text-[var(--light0)] p-1.5 border border-[var(--dark2)] cursor-pointer transition-colors"
-                  title="Copiar URL"
-                >
-                  🔗
-                </button>
+          <button
+            (click)="copyUrl(video.youtubeUrl)"
+            class="text-[var(--terminal-dim)] hover:text-[var(--terminal-bright)] cursor-pointer uppercase transition-colors"
+            title="Copiar URL"
+          >
+            [ COPIAR_URL ]
+          </button>
 
-                <button
-                  (click)="store.delete(video.id)"
-                  class="rounded-md bg-[var(--dark0-hard)] hover:bg-[rgba(251,73,52,0.2)] text-[var(--light3)] hover:text-[var(--bright-red)] p-1.5 border border-[var(--dark2)] cursor-pointer transition-colors"
-                  title="Eliminar de la lista"
-                >
-                  🗑
-                </button>
-              </div>
-            </td>
-          </tr>
-        } @empty {
-          <tr>
-            <td colspan="4" class="p-8 text-center text-[var(--light3)]">
-              @if (store.loading()) {
-                <div class="flex items-center justify-center gap-2">
-                  <span class="animate-spin text-lg">⚙</span>
-                  <span>Cargando historial de resúmenes...</span>
-                </div>
-              } @else {
-                <div class="flex flex-col items-center justify-center gap-1">
-                  <span class="text-2xl">📭</span>
-                  <p class="font-medium text-[var(--light2)]">No hay videos en este filtro</p>
-                  <p class="text-xs text-[var(--light3)]">Ingresa un enlace arriba para generar tu primer resumen.</p>
-                </div>
-              }
-            </td>
-          </tr>
+          <button
+            (click)="store.delete(video.id)"
+            class="text-[var(--terminal-dim)] hover:text-[var(--terminal-error)] cursor-pointer uppercase transition-colors"
+            title="Eliminar de la lista"
+          >
+            [ ELIMINAR ]
+          </button>
+        </div>
+      </div>
+    } @empty {
+      <div class="py-8 text-center text-xs text-[var(--terminal-dim)] uppercase">
+        @if (store.loading()) {
+          <p class="animate-pulse"># cargando registros de base de datos...</p>
+        } @else {
+          <p># no se encontraron entradas con los filtros actuales.</p>
         }
-      </tbody>
-    </table>
+      </div>
+    }
   </div>
-</div>
+</section>
+

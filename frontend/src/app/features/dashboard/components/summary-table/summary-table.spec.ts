@@ -89,7 +89,7 @@ describe('SummaryTableComponent', () => {
     // Act
     const buttons = fixture.nativeElement.querySelectorAll('button');
     const successFilterBtn = Array.from(buttons).find((b: any) =>
-      b.textContent.includes('Completados'),
+      b.textContent.includes('COMPLETADOS'),
     ) as HTMLButtonElement;
 
     expect(successFilterBtn).toBeTruthy();
