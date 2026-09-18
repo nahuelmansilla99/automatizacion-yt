@@ -14,7 +14,7 @@
     <div class="flex items-center gap-4">
       <a
         routerLink="/"
-        routerLinkActive="text-[var(--terminal-bright)] font-bold underline"
+        routerLinkActive="bg-[var(--terminal-bright)] !text-black px-1.5 py-0.5 no-underline"
         [routerLinkActiveOptions]="{ exact: true }"
         class="underline underline-offset-4 text-[var(--terminal-base)] hover:text-[var(--terminal-bright)] transition-colors"
       >
@@ -22,7 +22,7 @@
       </a>
       <a
         routerLink="/prompts"
-        routerLinkActive="text-[var(--terminal-bright)] font-bold underline"
+        routerLinkActive="bg-[var(--terminal-bright)] !text-black px-1.5 py-0.5 no-underline"
         class="underline underline-offset-4 text-[var(--terminal-base)] hover:text-[var(--terminal-bright)] transition-colors"
       >
         /prompts
@@ -33,22 +33,21 @@
     <div class="flex items-center gap-1.5 text-xs">
       @if (store.isWsConnected()) {
         <span class="text-[var(--terminal-success)]">●</span>
-        <span class="text-[var(--terminal-bright)]">EN_VIVO</span>
+        <span class="terminal-text-bright font-bold">EN_VIVO</span>
       } @else {
         <span class="text-[var(--terminal-error)]">○</span>
-        <span class="text-[var(--terminal-bright)]">DESCONECTADO</span>
+        <span class="terminal-text-dim">DESCONECTADO</span>
       }
     </div>
   </nav>
 
   <!-- Title & Description -->
   <div class="flex flex-col gap-1 border-b border-[var(--terminal-border)] pb-4">
-    <h1 class="text-sm sm:text-base font-bold text-[var(--terminal-bright)] tracking-wider">
+    <h1 class="terminal-heading tracking-wider">
       SHYT :: SUMMARY HUB YOUTUBE
     </h1>
-    <p class="text-xs text-[var(--terminal-dim)]">
+    <p class="terminal-subheading">
       # automatización de resúmenes con n8n, gemini llm y supadata
     </p>
   </div>
 </header>
-

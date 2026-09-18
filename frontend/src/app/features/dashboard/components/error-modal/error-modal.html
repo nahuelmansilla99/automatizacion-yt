@@ -1,25 +1,25 @@
 @if (store.errorModalSummary(); as summary) {
   <div
-    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 font-mono"
+    class="fixed terminal-modal-backdrop"
     (click)="store.closeErrorModal()"
   >
     <div
-      class="relative flex flex-col w-full max-w-xl bg-[var(--terminal-bg)] border border-[var(--terminal-error)] shadow-2xl overflow-hidden"
+      class="terminal-modal-window max-w-xl border border-[var(--terminal-error)]"
       (click)="$event.stopPropagation()"
     >
       <!-- Cabecera -->
-      <div class="flex items-center justify-between border-b border-[var(--terminal-border)] bg-[var(--terminal-bg-alt)] p-4">
-        <div class="flex items-center gap-2 text-xs">
+      <div class="terminal-modal-header !flex-row items-center justify-between">
+        <div class="flex items-center gap-2 text-xs truncate">
           <span class="text-[var(--terminal-error)] font-bold">[ ! ERROR_N8N ]</span>
-          <span class="text-[var(--terminal-dim)]">::</span>
-          <span class="text-[var(--terminal-dim)] truncate max-w-xs uppercase">
+          <span class="terminal-text-dim">::</span>
+          <span class="terminal-text-dim truncate max-w-xs uppercase">
             {{ summary.videoTitle || summary.youtubeUrl }}
           </span>
         </div>
 
         <button
           (click)="store.closeErrorModal()"
-          class="text-xs text-[var(--terminal-dim)] hover:text-[var(--terminal-bright)] font-bold cursor-pointer uppercase px-1"
+          class="terminal-action-link-bright px-1"
           title="Cerrar modal de error"
         >
           [ X ]
@@ -29,7 +29,7 @@
       <!-- Cuerpo -->
       <div class="p-4 sm:p-5 flex flex-col gap-4 text-xs select-text">
         <div class="flex flex-col gap-1">
-          <span class="text-[var(--terminal-dim)] uppercase tracking-wider">
+          <span class="terminal-label">
             &gt; error_output :
           </span>
           <div class="bg-[var(--terminal-bg-alt)] border border-[var(--terminal-border)] p-3 text-xs text-[var(--terminal-error)] leading-relaxed whitespace-pre-wrap font-mono">
@@ -37,25 +37,25 @@
           </div>
         </div>
 
-        <div class="flex flex-col gap-1 border border-[var(--terminal-border)] p-3 text-[var(--terminal-dim)]">
-          <p><span class="text-[var(--terminal-base)]">url_video ....... </span> <a [href]="summary.youtubeUrl" target="_blank" class="text-[var(--terminal-bright)] hover:underline truncate">{{ summary.youtubeUrl }}</a></p>
-          <p><span class="text-[var(--terminal-base)]">timestamp ....... </span> {{ summary.updatedAt | date: 'yyyy-MM-dd HH:mm:ss' }}</p>
-          <p><span class="text-[var(--terminal-base)]">registro_id ..... </span> <code class="text-[var(--terminal-base)]">{{ summary.id }}</code></p>
+        <div class="flex flex-col gap-1 border border-[var(--terminal-border)] p-3 terminal-text-dim">
+          <p><span class="terminal-text">url_video ....... </span> <a [href]="summary.youtubeUrl" target="_blank" class="text-[var(--terminal-bright)] hover:underline truncate">{{ summary.youtubeUrl }}</a></p>
+          <p><span class="terminal-text">timestamp ....... </span> {{ summary.updatedAt | date: 'yyyy-MM-dd HH:mm:ss' }}</p>
+          <p><span class="terminal-text">registro_id ..... </span> <code class="terminal-text">{{ summary.id }}</code></p>
         </div>
       </div>
 
       <!-- Pie -->
-      <div class="flex items-center justify-end gap-3 border-t border-[var(--terminal-border)] bg-[var(--terminal-bg-alt)] px-4 py-3 text-xs">
+      <div class="terminal-modal-footer justify-end gap-3 py-3">
         <button
           (click)="store.closeErrorModal()"
-          class="border border-[var(--terminal-border)] hover:border-[var(--terminal-bright)] px-3 py-1.5 text-[var(--terminal-base)] hover:text-[var(--terminal-bright)] cursor-pointer uppercase transition-colors"
+          class="terminal-btn"
         >
           [ CERRAR ]
         </button>
 
         <button
           (click)="onRetry(summary.id)"
-          class="border border-[var(--terminal-bright)] bg-[var(--terminal-bright)] text-black px-4 py-1.5 font-bold cursor-pointer uppercase hover:bg-transparent hover:text-[var(--terminal-bright)] transition-colors"
+          class="terminal-btn-primary"
         >
           [ ↻ REINTENTAR_N8N ]
         </button>
@@ -63,4 +63,3 @@
     </div>
   </div>
 }
-

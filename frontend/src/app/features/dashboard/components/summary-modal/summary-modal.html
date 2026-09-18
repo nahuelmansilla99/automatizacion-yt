@@ -1,31 +1,31 @@
 @if (store.isModalOpen() && store.selectedSummary(); as summary) {
   <div
-    class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/90 font-mono"
+    class="fixed terminal-modal-backdrop"
     (click)="onBackdropClick($event)"
   >
     <div
-      class="relative flex flex-col w-full max-w-4xl max-h-[90vh] bg-[var(--terminal-bg)] border border-[var(--terminal-bright)] shadow-2xl overflow-hidden"
+      class="terminal-modal-window max-w-4xl max-h-[90vh] border border-[var(--terminal-bright)]"
       (click)="$event.stopPropagation()"
     >
       <!-- Cabecera del Modal con box-drawing -->
-      <div class="flex flex-col gap-2 border-b border-[var(--terminal-border)] bg-[var(--terminal-bg-alt)] p-4">
-        <div class="flex items-center justify-between text-xs text-[var(--terminal-dim)]">
+      <div class="terminal-modal-header">
+        <div class="flex items-center justify-between terminal-text-dim">
           <div class="flex items-center gap-2 truncate">
-            <span class="text-[var(--terminal-bright)] font-bold">[ RESUMEN_MD ]</span>
+            <span class="terminal-text-bright font-bold">[ RESUMEN_MD ]</span>
             <span>::</span>
-            <span class="truncate text-[var(--terminal-base)] uppercase">{{ summary.channelName || 'CANAL_YOUTUBE' }}</span>
+            <span class="truncate terminal-text uppercase">{{ summary.channelName || 'CANAL_YOUTUBE' }}</span>
           </div>
 
           <button
             (click)="store.closeModal()"
-            class="text-xs text-[var(--terminal-dim)] hover:text-[var(--terminal-bright)] font-bold cursor-pointer uppercase px-1"
+            class="terminal-action-link-bright px-1"
             title="Cerrar modal"
           >
             [ X CERRAR ]
           </button>
         </div>
 
-        <h2 class="text-sm sm:text-base font-bold text-[var(--terminal-bright)] truncate uppercase">
+        <h2 class="terminal-heading truncate">
           {{ summary.videoTitle || 'RESUMEN_DE_VIDEO' }}
         </h2>
 
@@ -33,7 +33,7 @@
         <div class="flex flex-wrap items-center gap-2 text-xs pt-1 select-text">
           <button
             (click)="copyMarkdown()"
-            class="border border-[var(--terminal-border)] hover:border-[var(--terminal-bright)] px-2.5 py-1 text-[var(--terminal-base)] hover:text-[var(--terminal-bright)] cursor-pointer uppercase transition-colors"
+            class="terminal-btn"
             title="Copiar Markdown para Obsidian"
           >
             @if (copied()) {
@@ -45,7 +45,7 @@
 
           <button
             (click)="downloadMarkdown()"
-            class="border border-[var(--terminal-border)] hover:border-[var(--terminal-bright)] px-2.5 py-1 text-[var(--terminal-base)] hover:text-[var(--terminal-bright)] cursor-pointer uppercase transition-colors"
+            class="terminal-btn"
             title="Descargar archivo markdown"
           >
             [ DESCARGAR_.MD ]
@@ -54,7 +54,7 @@
           <button
             (click)="syncToDrive()"
             [disabled]="syncingDrive()"
-            class="border border-[var(--terminal-border)] hover:border-[var(--terminal-bright)] px-2.5 py-1 text-[var(--terminal-base)] hover:text-[var(--terminal-bright)] disabled:opacity-30 cursor-pointer uppercase transition-colors"
+            class="terminal-btn"
             title="Sincronizar archivo con Google Drive"
           >
             @if (syncingDrive()) {
@@ -68,7 +68,7 @@
             [href]="summary.youtubeUrl"
             target="_blank"
             rel="noopener noreferrer"
-            class="border border-[var(--terminal-border)] hover:border-[var(--terminal-bright)] px-2.5 py-1 text-[var(--terminal-bright)] hover:underline uppercase transition-colors ml-auto"
+            class="terminal-btn text-[var(--terminal-bright)] ml-auto"
             title="Abrir video en YouTube"
           >
             [ VER_EN_YT -&gt; ]
@@ -77,25 +77,24 @@
       </div>
 
       <!-- Contenido Markdown Renderizado -->
-      <div class="flex-1 overflow-y-auto p-4 sm:p-6 select-text text-xs sm:text-sm text-[var(--terminal-base)]">
+      <div class="flex-1 overflow-y-auto p-4 sm:p-6 select-text terminal-text">
         @if (summary.markdownContent) {
           <div
             class="markdown-body leading-relaxed"
             [innerHTML]="renderedMarkdown()"
           ></div>
         } @else {
-          <div class="text-center py-12 text-[var(--terminal-dim)] text-xs uppercase">
+          <div class="text-center py-12 terminal-text-dim uppercase">
             <p># el resumen aun no se ha generado o esta en proceso.</p>
           </div>
         }
       </div>
 
       <!-- Pie del Modal -->
-      <div class="flex flex-col sm:flex-row items-center justify-between gap-1 border-t border-[var(--terminal-border)] bg-[var(--terminal-bg-alt)] px-4 py-2 text-xs text-[var(--terminal-dim)] uppercase">
+      <div class="terminal-modal-footer flex-col sm:flex-row justify-between gap-1">
         <span>actualizado: {{ summary.updatedAt | date: 'yyyy-MM-dd HH:mm:ss' }}</span>
         <span>sync: google_drive</span>
       </div>
     </div>
   </div>
 }
-

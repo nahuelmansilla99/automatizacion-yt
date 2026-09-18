@@ -1,19 +1,19 @@
 @switch (status()) {
   @case ('SUCCESS') {
-    <span class="inline-flex items-center gap-1 text-xs text-[var(--terminal-success)] font-mono font-bold">
-      <span>●</span>
+    <span class="inline-flex items-center gap-1 text-xs text-[var(--terminal-bright)] font-mono font-bold">
+      <span class="text-[var(--terminal-success)]">●</span>
       <span>COMPLETADO</span>
     </span>
   }
   @case ('PENDING') {
-    <span class="inline-flex items-center gap-1 text-xs text-[var(--terminal-warn)] font-mono">
-      <span class="animate-spin">◌</span>
+    <span class="inline-flex items-center gap-1 text-xs text-[var(--terminal-bright)] font-mono">
+      <span class="animate-spin text-[var(--terminal-warn)]">◌</span>
       <span>PROCESANDO</span>
     </span>
   }
   @case ('ERROR') {
-    <span class="inline-flex items-center gap-1 text-xs text-[var(--terminal-error)] font-mono font-bold">
-      <span>✕</span>
+    <span class="inline-flex items-center gap-1 text-xs text-[var(--terminal-bright)] font-mono font-bold">
+      <span class="text-[var(--terminal-error)]">✕</span>
       <span>ERROR</span>
     </span>
   }

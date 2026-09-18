@@ -8,7 +8,7 @@
       (click)="store.loadMetrics(true)"
       [disabled]="store.metricsLoading()"
       title="Actualizar cuota de Supadata"
-      class="text-xs text-[var(--terminal-dim)] hover:text-[var(--terminal-bright)] ml-2 disabled:opacity-30 cursor-pointer uppercase transition-colors"
+      class="terminal-action-link ml-2 disabled:opacity-30"
     >
       @if (store.metricsLoading()) {
         <span>[ CARGANDO... ]</span>
@@ -21,26 +21,14 @@
   @if (store.metrics()?.supadata; as supadata) {
     <dl class="flex flex-col gap-1.5 text-xs">
       <div class="flex items-baseline justify-between gap-2">
-        <dt class="shrink-0 whitespace-pre text-[var(--terminal-dim)] uppercase">plan ............... </dt>
-        <dd class="min-w-0 text-right text-[var(--terminal-bright)] uppercase">{{ supadata.plan }}</dd>
-      </div>
-
-      <div class="flex items-baseline justify-between gap-2">
-        <dt class="shrink-0 whitespace-pre text-[var(--terminal-dim)] uppercase">creditos_usados .... </dt>
-        <dd class="min-w-0 text-right text-[var(--terminal-base)]">
-          <span class="text-[var(--terminal-bright)] font-bold">{{ supadata.usedCredits }}</span> / {{ supadata.maxCredits }} créditos
+        <dt class="shrink-0 whitespace-pre terminal-label">creditos_libres .... </dt>
+        <dd class="min-w-0 text-right text-[var(--terminal-bright)] font-semibold">
+          <span class="text-[var(--terminal-success)] font-bold">{{ supadata.remainingCredits }} créditos</span><span class="text-[var(--terminal-dim)]"> / {{ supadata.maxCredits }}</span>
         </dd>
       </div>
 
       <div class="flex items-baseline justify-between gap-2">
-        <dt class="shrink-0 whitespace-pre text-[var(--terminal-dim)] uppercase">creditos_libres .... </dt>
-        <dd class="min-w-0 text-right text-[var(--terminal-success)] font-semibold">
-          {{ supadata.remainingCredits }} créditos
-        </dd>
-      </div>
-
-      <div class="flex items-baseline justify-between gap-2">
-        <dt class="shrink-0 whitespace-pre text-[var(--terminal-dim)] uppercase">consumo_porcentual . </dt>
+        <dt class="shrink-0 whitespace-pre terminal-label">consumo_porcentual . </dt>
         <dd class="min-w-0 text-right font-bold" [class.text-[var(--terminal-bright)]]="usagePercent() < 70" [class.text-[var(--terminal-warn)]]="usagePercent() >= 70 && usagePercent() < 90" [class.text-[var(--terminal-error)]]="usagePercent() >= 90">
           {{ usagePercent() }}%
         </dd>
@@ -58,7 +46,7 @@
       </div>
     </dl>
   } @else {
-    <div class="border border-[var(--terminal-border)] p-3 text-xs text-[var(--terminal-dim)]">
+    <div class="border border-[var(--terminal-border)] p-3 terminal-text-dim">
       @if (store.metricsLoading()) {
         <p class="animate-pulse"># consultando metricas de api...</p>
       } @else {
@@ -67,4 +55,5 @@
     </div>
   }
 </section>
+
 
