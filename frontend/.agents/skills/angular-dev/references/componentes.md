@@ -11,6 +11,7 @@ Usar el decorator `@Component` para definir la metadata del componente.
   selector: 'app-perfil',
   templateUrl: './perfil.html',
   styleUrl: './perfil.css',
+  testTemplateUrl: './perfil.spec.ts',
 })
 export class Perfil {
   guardar() { /* ... */ }
@@ -22,6 +23,7 @@ export class Perfil {
 - `selector`: El selector CSS que identifica este componente en templates.
 - `templateUrl`: Path al archivo HTML externo (**Obligatorio**: cada componente debe tener su propio archivo `.html`).
 - `styleUrl`: Path al archivo CSS externo (**Obligatorio**: cada componente debe tener su propio archivo `.css`).
+- `testTemplateUrl`: Path al archivo de tests externo (**Obligatorio**: cada componente debe tener su propio archivo `.spec.ts`).
 - `imports`: Lista los componentes, directivas o pipes usados en el template de este componente.
 - `template` / `styles`: **Evitar / No usar**. No se permiten templates ni estilos inline embebidos en el archivo `.ts`.
 

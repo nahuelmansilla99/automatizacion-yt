@@ -1,12 +1,12 @@
-# Automatización de Resúmenes de YouTube (v3)
+# SHYT - Summary Hub YouTube (v3)
 
-Plataforma integral para automatizar la extracción, transcripción y resumen de videos de YouTube con Inteligencia Artificial, almacenamiento en **Google Drive (Obsidian)** y visualización interactiva web con el tema **Obsidian Gruvbox**.
+Plataforma integral para automatizar la extracción, transcripción y resumen de videos de YouTube con Inteligencia Artificial, almacenamiento en **Google Drive (Obsidian)** y visualización interactiva web con interfaz **Retro CRT Terminal (Fósforo Ámbar / Geist Mono)** inspirada en Basement AI.
 
 ---
 
 ## 🏛️ Arquitectura del Sistema
 
-* **Frontend:** Angular v21 (Standalone components, Signals, Reactive State Store, Tailwind CSS v4 con paleta Obsidian Gruvbox, selector y administrador de prompts).
+* **Frontend:** Angular v21 (Standalone components, Signals, Reactive State Store, Tailwind CSS v4 con sistema de diseño Retro CRT Terminal en fósforo ámbar, tipografía Geist Mono SemiBold con text-shadow glow, scanlines calibradas, selector y administrador de prompts).
 * **Backend:** NestJS 11 (TypeORM con PostgreSQL, WebSockets con Socket.IO para notificaciones en vivo, validación estricta con class-validator).
   * **Pipeline Nativo:** Extracción vía YouTube oEmbed, transcripción vía Supadata Transcript API y síntesis con Google Gemini (`@google/genai`).
   * **Gestor de Prompts Dinámico:** Selección de plantillas personalizadas, tags, fallback a prompt predeterminado y congelamiento de snapshots inmutables por cada resumen.

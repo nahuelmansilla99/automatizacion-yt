@@ -32,10 +32,10 @@ describe('NavbarComponent', () => {
 
     // Assert
     const el = fixture.nativeElement as HTMLElement;
-    expect(el.querySelector('h1')?.textContent).toContain('Obsidian YT Resúmenes');
+    expect(el.querySelector('h1')?.textContent).toContain('SHYT :: SUMMARY HUB YOUTUBE');
   });
 
-  it('debería indicar "En vivo" cuando el WebSocket está conectado', async () => {
+  it('debería indicar "EN_VIVO" cuando el WebSocket está conectado', async () => {
     // Act
     wsConnectedSignal.set(true);
 
@@ -44,10 +44,10 @@ describe('NavbarComponent', () => {
 
     // Assert
     const el = fixture.nativeElement as HTMLElement;
-    expect(el.textContent).toContain('En vivo');
+    expect(el.textContent).toContain('EN_VIVO');
   });
 
-  it('debería indicar "Desconectado" cuando el WebSocket no está conectado', async () => {
+  it('debería indicar "DESCONECTADO" cuando el WebSocket no está conectado', async () => {
     // Act
     wsConnectedSignal.set(false);
 
@@ -56,6 +56,6 @@ describe('NavbarComponent', () => {
 
     // Assert
     const el = fixture.nativeElement as HTMLElement;
-    expect(el.textContent).toContain('Desconectado');
+    expect(el.textContent).toContain('DESCONECTADO');
   });
 });

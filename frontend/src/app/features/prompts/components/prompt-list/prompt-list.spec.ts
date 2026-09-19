@@ -67,7 +67,7 @@ describe('PromptListComponent', () => {
 
     const el = fixture.nativeElement as HTMLElement;
     expect(el.textContent).toContain('Default Prompt');
-    expect(el.textContent).toContain('⭐ Predeterminado');
+    expect(el.textContent).toContain('Predeterminado');
     expect(el.textContent).toContain('#youtube');
     expect(el.textContent).toContain('Prompt Secundario');
     expect(el.textContent).toContain('Inactivo');

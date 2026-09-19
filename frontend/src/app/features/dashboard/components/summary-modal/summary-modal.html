@@ -1,61 +1,66 @@
 @if (store.isModalOpen() && store.selectedSummary(); as summary) {
   <div
-    class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/75 backdrop-blur-xs animate-in fade-in duration-200"
+    class="fixed terminal-modal-backdrop"
     (click)="onBackdropClick($event)"
   >
     <div
-      class="relative flex flex-col w-full max-w-4xl max-h-[90vh] rounded-2xl bg-[var(--dark0)] border border-[var(--dark2)] shadow-2xl overflow-hidden"
+      class="terminal-modal-window max-w-4xl max-h-[90vh] border border-[var(--terminal-bright)]"
       (click)="$event.stopPropagation()"
     >
-      <!-- Cabecera del Modal -->
-      <div class="flex items-start justify-between border-b border-[var(--dark2)] bg-[var(--dark0-hard)] p-4 sm:p-5">
-        <div class="pr-4 min-w-0">
-          <div class="flex items-center gap-2 mb-1">
-            <span class="rounded bg-[var(--dark2)] px-2 py-0.5 text-xs font-semibold text-[var(--bright-yellow)]">
-              Obsidian Note
-            </span>
-            <span class="text-xs text-[var(--light3)] truncate">
-              {{ summary.channelName || 'Canal de YouTube' }}
-            </span>
+      <!-- Cabecera del Modal con box-drawing -->
+      <div class="terminal-modal-header">
+        <div class="flex items-center justify-between terminal-text-dim">
+          <div class="flex items-center gap-2 truncate">
+            <span class="terminal-text-bright font-bold">[ RESUMEN_MD ]</span>
+            <span>::</span>
+            <span class="truncate terminal-text uppercase">{{ summary.channelName || 'CANAL_YOUTUBE' }}</span>
           </div>
-          <h2 class="text-base sm:text-lg font-bold text-[var(--light0)] truncate">
-            {{ summary.videoTitle || 'Resumen de Video' }}
-          </h2>
+
+          <button
+            (click)="store.closeModal()"
+            class="terminal-action-link-bright px-1"
+            title="Cerrar modal"
+          >
+            [ X CERRAR ]
+          </button>
         </div>
 
-        <!-- Botones de Acción Superiores -->
-        <div class="flex items-center gap-2 shrink-0">
+        <h2 class="terminal-heading truncate">
+          {{ summary.videoTitle || 'RESUMEN_DE_VIDEO' }}
+        </h2>
+
+        <!-- Botones de Acción Superiores estilo terminal -->
+        <div class="flex flex-wrap items-center gap-2 text-xs pt-1 select-text">
           <button
             (click)="copyMarkdown()"
-            class="flex items-center gap-1.5 rounded-lg bg-[var(--dark1)] hover:bg-[var(--dark2)] text-[var(--light1)] px-3 py-1.5 text-xs font-semibold border border-[var(--dark2)] cursor-pointer transition-colors"
-            title="Copiar contenido Markdown para pegar en Obsidian"
+            class="terminal-btn"
+            title="Copiar Markdown para Obsidian"
           >
             @if (copied()) {
-              <span class="text-[var(--bright-green)]">✓ Copiado</span>
+              <span class="text-[var(--terminal-success)] font-bold">[ ✓ COPIADO ]</span>
             } @else {
-              <span>Copiar Markdown</span>
+              <span>[ COPIAR_MD ]</span>
             }
           </button>
 
           <button
             (click)="downloadMarkdown()"
-            class="hidden sm:flex items-center gap-1.5 rounded-lg bg-[var(--dark1)] hover:bg-[var(--dark2)] text-[var(--light1)] px-3 py-1.5 text-xs font-semibold border border-[var(--dark2)] cursor-pointer transition-colors"
-            title="Descargar archivo .md"
+            class="terminal-btn"
+            title="Descargar archivo markdown"
           >
-            <span>Descargar .md</span>
+            [ DESCARGAR_.MD ]
           </button>
 
           <button
             (click)="syncToDrive()"
             [disabled]="syncingDrive()"
-            class="flex items-center gap-1.5 rounded-lg bg-[rgba(131,165,152,0.15)] hover:bg-[rgba(131,165,152,0.25)] text-[var(--bright-blue)] px-3 py-1.5 text-xs font-semibold border border-[rgba(131,165,152,0.3)] cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            title="Sincronizar archivo .md con Google Drive vía n8n"
+            class="terminal-btn"
+            title="Sincronizar archivo con Google Drive"
           >
             @if (syncingDrive()) {
-              <span class="animate-spin">⏳</span>
-              <span>Subiendo...</span>
+              <span class="animate-pulse">[ SUBIENDO... ]</span>
             } @else {
-              <span>☁ Subir a Drive</span>
+              <span>[ SUBIR_A_DRIVE ]</span>
             }
           </button>
 
@@ -63,44 +68,32 @@
             [href]="summary.youtubeUrl"
             target="_blank"
             rel="noopener noreferrer"
-            class="flex items-center gap-1.5 rounded-lg bg-[rgba(251,73,52,0.15)] hover:bg-[rgba(251,73,52,0.25)] text-[var(--bright-red)] px-3 py-1.5 text-xs font-semibold border border-[rgba(251,73,52,0.3)] transition-colors"
+            class="terminal-btn text-[var(--terminal-bright)] ml-auto"
             title="Abrir video en YouTube"
           >
-            <span>▶ Video</span>
+            [ VER_EN_YT -&gt; ]
           </a>
-
-          <button
-            (click)="store.closeModal()"
-            class="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--dark1)] text-[var(--light2)] hover:text-[var(--light0)] hover:bg-[var(--dark2)] border border-[var(--dark2)] cursor-pointer transition-colors"
-          >
-            ✕
-          </button>
         </div>
       </div>
 
       <!-- Contenido Markdown Renderizado -->
-      <div class="flex-1 overflow-y-auto p-5 sm:p-8">
+      <div class="flex-1 overflow-y-auto p-4 sm:p-6 select-text terminal-text">
         @if (summary.markdownContent) {
           <div
-            class="markdown-body text-sm leading-relaxed"
+            class="markdown-body leading-relaxed"
             [innerHTML]="renderedMarkdown()"
           ></div>
         } @else {
-          <div class="text-center py-12 text-[var(--light3)] text-sm">
-            <p class="text-lg mb-2">⏳</p>
-            <p>El resumen aún no se ha generado o está en proceso.</p>
+          <div class="text-center py-12 terminal-text-dim uppercase">
+            <p># el resumen aun no se ha generado o esta en proceso.</p>
           </div>
         }
       </div>
 
       <!-- Pie del Modal -->
-      <div class="flex items-center justify-between border-t border-[var(--dark2)] bg-[var(--dark0-hard)] px-5 py-3 text-xs text-[var(--light3)]">
-        <span>
-          Generado: {{ summary.updatedAt | date: 'medium' }}
-        </span>
-        <span>
-          Guardado automáticamente en Google Drive
-        </span>
+      <div class="terminal-modal-footer flex-col sm:flex-row justify-between gap-1">
+        <span>actualizado: {{ summary.updatedAt | date: 'yyyy-MM-dd HH:mm:ss' }}</span>
+        <span>sync: google_drive</span>
       </div>
     </div>
   </div>

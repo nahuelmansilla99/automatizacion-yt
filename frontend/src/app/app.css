@@ -1,0 +1,15 @@
+.machine-flicker {
+  animation: flicker 0.25s infinite;
+}
+
+@keyframes flicker {
+  0% {
+    opacity: 0.985;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.99;
+  }
+}
