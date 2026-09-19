@@ -2,141 +2,134 @@
 
 :root {
   /* ==========================================================================
-     Paleta Base: Obsidian Gruvbox
+     Paleta Base: basement.studio / machine terminal
      ========================================================================== */
-  --dark0-hard_x:     29, 32, 33;    /* #1d2021 */
-  --dark0-hard:       rgb(var(--dark0-hard_x));
-  --dark0_x:          40, 40, 40;    /* #282828 */
-  --dark0:            rgb(var(--dark0_x));
-  --dark0-soft_x:     50, 48, 47;    /* #32302f */
-  --dark0-soft:       rgb(var(--dark0-soft_x));
-  --dark1_x:          60, 56, 54;    /* #3c3836 */
-  --dark1:            rgb(var(--dark1_x));
-  --dark2_x:          80, 73, 69;    /* #504945 */
-  --dark2:            rgb(var(--dark2_x));
-  --dark3_x:          102, 92, 84;   /* #665c54 */
-  --dark3:            rgb(var(--dark3_x));
-  --dark4_x:          124, 111, 100; /* #7c6f64 */
-  --dark4:            rgb(var(--dark4_x));
-  --gray_x:           146, 131, 116; /* #928374 */
-  --gray:             rgb(var(--gray_x));
+  --terminal-bg:            #000000;
+  --terminal-bg-alt:        #080808;
+  --terminal-bright:        #ff4d00;
+  --terminal-base:          #993000;
+  /* --terminal-base:          #cc4400; */
+  --terminal-dim:           #7a2200; 
+  --terminal-border:        #2a0e00;
 
-  --light0-hard_x:    249, 245, 215; /* #f9f5d7 */
-  --light0-hard:      rgb(var(--light0-hard_x));
-  --light0_x:         251, 241, 199; /* #fbf1c7 */
-  --light0:           rgb(var(--light0_x));
-  --light0-soft_x:    242, 229, 188; /* #f2e5bc */
-  --light0-soft:      rgb(var(--light0-soft_x));
-  --light1_x:         235, 219, 178; /* #ebdbb2 */
-  --light1:           rgb(var(--light1_x));
-  --light2_x:         213, 196, 161; /* #d5c4a1 */
-  --light2:           rgb(var(--light2_x));
-  --light3_x:         189, 174, 147; /* #bdae93 */
-  --light3:           rgb(var(--light3_x));
-  --light4_x:         168, 153, 132; /* #a89984 */
-  --light4:           rgb(var(--light4_x));
+  --terminal-success:       #44bb00;
+  --terminal-warn:          #ffaa00;
+  --terminal-error:         #ff3300;
+  --terminal-info:          #0088cc;
 
-  --bright-red_x:     251, 73, 52;   /* #fb4934 */
-  --bright-red:       rgb(var(--bright-red_x));
-  --bright-green_x:   184, 187, 38;  /* #b8bb26 */
-  --bright-green:     rgb(var(--bright-green_x));
-  --bright-yellow_x:  250, 189, 47;  /* #fabd2f */
-  --bright-yellow:    rgb(var(--bright-yellow_x));
-  --bright-blue_x:    131, 165, 152; /* #83a598 */
-  --bright-blue:      rgb(var(--bright-blue_x));
-  --bright-purple_x:  211, 134, 155; /* #d3869b */
-  --bright-purple:    rgb(var(--bright-purple_x));
-  --bright-aqua_x:    142, 192, 124; /* #8ec07c */
-  --bright-aqua:      rgb(var(--bright-aqua_x));
-  --bright-orange_x:  254, 128, 25;  /* #fe8019 */
-  --bright-orange:    rgb(var(--bright-orange_x));
+  /* Aliases estilo basement */
+  --machine-bg:             var(--terminal-bg);
+  --machine-base:           var(--terminal-base);
+  --machine-bright:         var(--terminal-bright);
+  --machine-dim:            var(--terminal-dim);
+  --machine-border:         var(--terminal-border);
 
-  --neutral-red_x:    204, 36, 29;   /* #cc241d */
-  --neutral-red:      rgb(var(--neutral-red_x));
-  --neutral-green_x:  152, 151, 26;  /* #98971a */
-  --neutral-green:    rgb(var(--neutral-green_x));
-  --neutral-yellow_x: 215, 153, 33;  /* #d79921 */
-  --neutral-yellow:   rgb(var(--neutral-yellow_x));
-  --neutral-yellow_x2:233, 202, 113; /* #f9edd7 */
-  --neutral-yellow2:  rgb(var(--neutral-yellow_x2));
-  --neutral-blue_x:   69, 133, 136;  /* #458588 */
-  --neutral-blue:     rgb(var(--neutral-blue_x));
-  --neutral-purple_x: 177, 98, 134;  /* #b16286 */
-  --neutral-purple:   rgb(var(--neutral-purple_x));
-  --neutral-aqua_x:   104, 157, 106; /* #689d6a */
-  --neutral-aqua:     rgb(var(--neutral-aqua_x));
-  --neutral-orange_x: 214, 93, 14;   /* #d65d0e */
-  --neutral-orange:   rgb(var(--neutral-orange_x));
+  /* Mapeo de compatibilidad hacia variables existentes */
+  --dark0-hard:             #000000;
+  --dark0-hard_x:           0, 0, 0;
+  --dark0:                  #050505;
+  --dark0_x:                5, 5, 5;
+  --dark0-soft:             #0a0a0a;
+  --dark0-soft_x:           10, 10, 10;
+  --dark1:                  #120600;
+  --dark1_x:                18, 6, 0;
+  --dark2:                  #2a0e00;
+  --dark2_x:                42, 14, 0;
+  --dark3:                  #441600;
+  --dark3_x:                68, 22, 0;
+  --dark4:                  #662200;
+  --dark4_x:                102, 34, 0;
+  --gray:                   #7a2200;
+  --gray_x:                 122, 34, 0;
 
-  --faded-red_x:      157, 0, 6;     /* #9d0006 */
-  --faded-red:        rgb(var(--faded-red_x));
-  --faded-green_x:    121, 116, 14;  /* #79740e */
-  --faded-green:      rgb(var(--faded-green_x));
-  --faded-yellow_x:   181, 118, 20;  /* #b57614 */
-  --faded-yellow:     rgb(var(--faded-yellow_x));
-  --faded-blue_x:     7, 102, 120;   /* #076678 */
-  --faded-blue:       rgb(var(--faded-blue_x));
-  --faded-purple_x:   143, 63, 113;  /* #8f3f71 */
-  --faded-purple:     rgb(var(--faded-purple_x));
-  --faded-aqua_x:     66, 123, 88;   /* #427b58 */
-  --faded-aqua:       rgb(var(--faded-aqua_x));
-  --faded-orange_x:   175, 58, 3;    /* #af3a03 */
-  --faded-orange:     rgb(var(--faded-orange_x));
+  --light0-hard:            #ff7711;
+  --light0-hard_x:          255, 119, 17;
+  --light0:                 #ff6600;
+  --light0_x:               255, 102, 0;
+  --light0-soft:            #ee5500;
+  --light0-soft_x:          238, 85, 0;
+  --light1:                 #cc4400;
+  --light1_x:               204, 68, 0;
+  --light2:                 #aa3300;
+  --light2_x:               170, 51, 0;
+  --light3:                 #7a2200;
+  --light3_x:               122, 34, 0;
+  --light4:                 #551600;
+  --light4_x:               85, 22, 0;
 
-  /* ==========================================================================
-     Variables Semánticas del Tema Dark (Por defecto en :root)
-     Adaptado con precisión al archivo de tema Obsidian Gruvbox
-     ========================================================================== */
+  --bright-red:             #ff3300;
+  --bright-red_x:           255, 51, 0;
+  --bright-green:           #44bb00;
+  --bright-green_x:         68, 187, 0;
+  --bright-yellow:          #ffaa00;
+  --bright-yellow_x:        255, 170, 0;
+  --bright-blue:            #0088cc;
+  --bright-blue_x:          0, 136, 204;
+  --bright-purple:          #cc4400;
+  --bright-purple_x:        204, 68, 0;
+  --bright-aqua:            #ff7711;
+  --bright-aqua_x:          255, 119, 17;
+  --bright-orange:          #ff6600;
+  --bright-orange_x:        255, 102, 0;
 
-  /* --- Colores de Paleta y RGB (Theme Dark) --- */
-  --color-red-rgb:                var(--neutral-red_x);
-  --color-red:                    var(--neutral-red);
-  --color-purple-rgb:             var(--neutral-purple_x);
-  --color-purple:                 var(--neutral-purple);
-  --color-green-rgb:              var(--neutral-green_x);
-  --color-green:                  var(--neutral-green);
-  --color-cyan-rgb:               var(--neutral-blue_x);
-  --color-cyan:                   var(--neutral-blue);
-  --color-blue-rgb:               var(--faded-blue_x);
-  --color-blue:                   var(--faded-blue);
-  --color-yellow-rgb:             var(--neutral-yellow_x);
-  --color-yellow:                 var(--neutral-yellow);
-  --color-orange-rgb:             var(--neutral-orange_x);
-  --color-orange:                 var(--neutral-orange);
-  --color-pink-rgb:               var(--bright-purple_x);
-  --color-pink:                   var(--bright-purple);
-  --color-aqua:                   var(--bright-aqua);
-  --color-aqua-rgb:               var(--bright-aqua_x);
+  --neutral-red:            #dd2200;
+  --neutral-red_x:          221, 34, 0;
+  --neutral-green:          #44bb00;
+  --neutral-green_x:        68, 187, 0;
+  --neutral-yellow:         #ffaa00;
+  --neutral-yellow_x:       255, 170, 0;
+  --neutral-yellow2:        #ff8800;
+  --neutral-yellow_x2:      255, 136, 0;
+  --neutral-blue:           #0088cc;
+  --neutral-blue_x:         0, 136, 204;
+  --neutral-purple:         #cc4400;
+  --neutral-purple_x:       204, 68, 0;
+  --neutral-aqua:           #ff7711;
+  --neutral-aqua_x:         255, 119, 17;
+  --neutral-orange:         #ff6600;
+  --neutral-orange_x:       255, 102, 0;
 
-  /* --- Fondos (Backgrounds) --- */
-  --background-primary:           var(--dark0);
-  --background-primary-alt:       var(--dark0);
-  --background-secondary:         var(--dark0-hard);
-  --background-secondary-alt:     var(--dark1);
-  --background-modifier-border:   var(--dark1);
-  --background-page:              var(--dark0-hard);
+  --faded-red:              #991100;
+  --faded-red_x:            153, 17, 0;
+  --faded-green:            #2e7d00;
+  --faded-green_x:          46, 125, 0;
+  --faded-yellow:           #996600;
+  --faded-yellow_x:         153, 102, 0;
+  --faded-blue:             #005580;
+  --faded-blue_x:           0, 85, 128;
+  --faded-purple:           #662200;
+  --faded-purple_x:         102, 34, 0;
+  --faded-aqua:             #883300;
+  --faded-aqua_x:           136, 51, 0;
+  --faded-orange:           #7a2200;
+  --faded-orange_x:         122, 34, 0;
 
-  /* Aliases rápidos para fondos */
-  --bg-page:                      var(--background-page);
-  --bg-primary:                   var(--background-primary);
-  --bg-primary-alt:               var(--background-primary-alt);
-  --bg-card:                      var(--dark1);
-  --bg-card-hover:                var(--dark2);
-  --border-color:                 var(--dark2);
-  --border-subtle:                var(--dark1);
+  /* Fondos y bordes semánticos */
+  --background-primary:           var(--terminal-bg);
+  --background-primary-alt:       var(--terminal-bg-alt);
+  --background-secondary:         var(--terminal-bg);
+  --background-secondary-alt:     var(--terminal-bg-alt);
+  --background-modifier-border:   var(--terminal-border);
+  --background-page:              var(--terminal-bg);
 
-  --cursor-line-background:        rgba(var(--dark1_x), 0.3);
+  --bg-page:                      var(--terminal-bg);
+  --bg-primary:                   var(--terminal-bg);
+  --bg-primary-alt:               var(--terminal-bg-alt);
+  --bg-card:                      var(--terminal-bg);
+  --bg-card-hover:                var(--terminal-bg-alt);
+  --border-color:                 var(--terminal-border);
+  --border-subtle:                var(--terminal-border);
 
-  /* --- Textos (Typography & Text) --- */
-  --text-normal:                  var(--light0);
-  --text-faint:                   var(--light1);
-  --text-muted:                   var(--light2);
-  --text-strong:                  var(--light0-hard);
-  --text-secondary:               var(--light1);
-  --text-main:                    var(--text-normal);
-  --text-body:                    var(--text-secondary);
+  /* Textos semánticos */
+  --text-normal:                  var(--terminal-base);
+  --text-faint:                   var(--terminal-dim);
+  --text-muted:                   var(--terminal-dim);
+  --text-strong:                  var(--terminal-bright);
+  --text-secondary:               var(--terminal-dim);
+  --text-main:                    var(--terminal-base);
+  --text-body:                    var(--terminal-base);
 
-  --link-url:                     var(--neutral-green);
+  --link-url:                     var(--terminal-bright);
 
   /* Encabezados */
   --h1-color:                     var(--neutral-red);
@@ -563,7 +556,7 @@ body {
   margin: 1rem 0;
 }
 
-/* Scrollbar Gruvbox */
+/* Scrollbar Terminal */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -579,7 +572,7 @@ body {
   background: var(--scrollbar-thumb-hover);
 }
 
-/* Estilos de Renderizado Markdown para el Modal Obsidian Gruvbox */
+/* Estilos de Renderizado Markdown para el Modal CRT Terminal */
 .markdown-body {
   color: var(--text-normal);
   line-height: 1.6;
@@ -742,3 +735,335 @@ body {
 .markdown-body tbody tr:hover {
   background-color: var(--table-row-background-hover);
 }
+
+/* ==========================================================================
+   Terminal Typography & Helpers
+   ========================================================================== */
+html, body {
+  background-color: var(--terminal-bg);
+  color: var(--terminal-base);
+  font-family: 'Geist Mono', 'Geist Mono Regular', ui-monospace, monospace;
+  font-weight: 600;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+.machine-screen {
+  text-shadow: 0 0 6px rgba(255, 77, 0, 0.35);
+}
+
+::selection {
+  background-color: var(--terminal-bright);
+  color: #000000;
+}
+
+.terminal-uppercase {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.terminal-divider {
+  overflow: hidden;
+  white-space: nowrap;
+  color: var(--terminal-dim);
+  user-select: none;
+}
+
+/* ==========================================================================
+   Terminal Reusable Classes (Design System)
+   ========================================================================== */
+
+/* Tipografía y Textos */
+.terminal-heading {
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.25rem;
+  font-weight: 700;
+  color: var(--terminal-bright);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+@media (min-width: 640px) {
+  .terminal-heading {
+    font-size: 1rem; /* 16px */
+    line-height: 1.5rem;
+  }
+}
+
+.terminal-subheading {
+  font-size: 0.75rem; /* 12px */
+  color: var(--terminal-dim);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.terminal-text {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: var(--terminal-base);
+  font-weight: 600;
+}
+
+.terminal-text-dim {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: var(--terminal-dim);
+  font-weight: 600;
+}
+
+.terminal-text-bright {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: var(--terminal-bright);
+  font-weight: 600;
+}
+
+.terminal-label {
+  font-size: 0.75rem;
+  color: var(--terminal-dim);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* Botones y Enlaces de Acción */
+.terminal-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.75rem;
+  font-family: inherit;
+  text-transform: uppercase;
+  background-color: transparent;
+  color: var(--terminal-base);
+  border: 1px solid var(--terminal-border);
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.terminal-btn:hover {
+  color: var(--terminal-bright);
+  border-color: var(--terminal-bright);
+}
+
+.terminal-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.terminal-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background-color: var(--terminal-bright);
+  color: #000000;
+  border: 1px solid var(--terminal-bright);
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.terminal-btn-primary:hover {
+  background-color: transparent;
+  color: var(--terminal-bright);
+}
+
+.terminal-btn-primary:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.terminal-btn-error {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: inherit;
+  text-transform: uppercase;
+  background-color: transparent;
+  color: var(--terminal-error);
+  border: 1px solid var(--terminal-error);
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.terminal-btn-error:hover {
+  background-color: var(--terminal-error);
+  color: #000000;
+}
+
+.terminal-action-link {
+  font-size: 0.75rem;
+  font-family: inherit;
+  text-transform: uppercase;
+  color: var(--terminal-dim);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color 150ms ease;
+}
+
+.terminal-action-link:hover {
+  color: var(--terminal-bright);
+}
+
+.terminal-action-link-bright {
+  font-size: 0.75rem;
+  font-family: inherit;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--terminal-bright);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.terminal-action-link-bright:hover {
+  text-decoration: underline;
+}
+
+.terminal-action-link-error {
+  font-size: 0.75rem;
+  font-family: inherit;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--terminal-error);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.terminal-action-link-error:hover {
+  text-decoration: underline;
+}
+
+.terminal-filter-btn {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-family: inherit;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 150ms ease;
+  color: var(--terminal-base);
+}
+
+.terminal-filter-btn:hover {
+  color: var(--terminal-bright);
+}
+
+.terminal-filter-btn.active {
+  background-color: var(--terminal-bright);
+  color: #000000;
+  font-weight: 700;
+}
+
+/* Inputs & Form Elements */
+.terminal-input {
+  width: 100%;
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid var(--terminal-border);
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--terminal-bright);
+  font-family: inherit;
+  transition: border-color 150ms ease;
+}
+
+@media (min-width: 640px) {
+  .terminal-input {
+    font-size: 0.875rem;
+  }
+}
+
+.terminal-input::placeholder {
+  color: var(--terminal-dim);
+}
+
+.terminal-input:focus {
+  outline: none;
+  border-bottom-color: var(--terminal-bright);
+}
+
+.terminal-select {
+  width: 100%;
+  background-color: var(--terminal-bg);
+  border: 1px solid var(--terminal-border);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  color: var(--terminal-bright);
+  font-family: inherit;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 150ms ease;
+}
+
+.terminal-select:focus {
+  outline: none;
+  border-color: var(--terminal-bright);
+}
+
+/* Modales & Cajas de Diálogo */
+.terminal-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem;
+  background-color: rgba(0, 0, 0, 0.9);
+  font-family: inherit;
+}
+
+@media (min-width: 640px) {
+  .terminal-modal-backdrop {
+    padding: 1.5rem;
+  }
+}
+
+.terminal-modal-window {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background-color: var(--terminal-bg);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+.terminal-modal-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--terminal-border);
+  background-color: var(--terminal-bg-alt);
+  padding: 1rem;
+}
+
+.terminal-modal-footer {
+  display: flex;
+  align-items: center;
+  border-top: 1px solid var(--terminal-border);
+  background-color: var(--terminal-bg-alt);
+  padding: 0.5rem 1rem;
+  font-size: 0.75rem;
+  color: var(--terminal-dim);
+  text-transform: uppercase;
+}
+
+

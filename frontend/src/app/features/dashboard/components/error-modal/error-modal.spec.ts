@@ -66,7 +66,7 @@ describe('ErrorModalComponent', () => {
     // Assert
     const el = fixture.nativeElement as HTMLElement;
     expect(el.querySelector('.fixed')).toBeTruthy();
-    expect(el.textContent).toContain('Detalle del Error de n8n');
+    expect(el.textContent).toContain('ERROR_N8N');
     expect(el.textContent).toContain('Error en nodo de n8n: Supadata timeout');
   });
 

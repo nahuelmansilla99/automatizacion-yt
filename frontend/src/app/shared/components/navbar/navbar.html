@@ -1,52 +1,53 @@
-<header class="border-b border-[var(--dark2)] bg-[var(--background-secondary-alt)] px-4 py-3 sm:px-8">
-  <div class="mx-auto flex max-w-7xl items-center justify-between">
-    <!-- Logo, Titulo & Nav -->
-    <div class="flex items-center gap-3">
-      <div>
-        <div class="flex items-center gap-2">
-          <h1 class="text-lg font-bold text-[var(--color-red)] tracking-tight">
-            Resumen YT
-          </h1>
-          <span class="rounded bg-[var(--dark1)] px-2 py-0.5 text-xs font-semibold text-[var(--bright-aqua)] border border-[var(--dark2)]">
-            v2.0
-          </span>
-        </div>
-      </div>
+<header class="w-full max-w-2xl mx-auto pt-8 pb-4 flex flex-col gap-4 uppercase font-mono">
+  <!-- ASCII Art SHYT -->
+  <a aria-label="Machine index" routerLink="/" class="block text-[var(--terminal-bright)] hover:opacity-90 transition-opacity">
+    <pre aria-hidden="true" class="w-full text-[min(14px,calc((100vw-2rem)/38))] leading-tight overflow-x-auto text-[var(--terminal-bright)]">███████╗██╗  ██╗██╗   ██╗████████╗
+██╔════╝██║  ██║╚██╗ ██╔╝╚══██╔══╝
+███████╗███████║ ╚████╔╝    ██║   
+╚════██║██╔══██║  ╚██╔╝     ██║   
+███████║██║  ██║   ██║      ██║   
+╚══════╝╚═╝  ╚═╝   ╚═╝      ╚═╝   </pre>
+  </a>
 
-      <!-- Nav Links -->
-      <nav class="hidden sm:flex items-center gap-1 ml-6">
-        <a
-          routerLink="/"
-          routerLinkActive="text-[var(--bright-orange)] border-[var(--bright-orange)]"
-          [routerLinkActiveOptions]="{ exact: true }"
-          class="px-3 py-1.5 rounded-lg text-sm font-medium border border-transparent text-[var(--light3)] hover:text-[var(--light0)] hover:border-[var(--dark3)] transition-colors"
-        >
-          Dashboard
-        </a>
-        <a
-          routerLink="/prompts"
-          routerLinkActive="text-[var(--bright-orange)] border-[var(--bright-orange)]"
-          class="px-3 py-1.5 rounded-lg text-sm font-medium border border-transparent text-[var(--light3)] hover:text-[var(--light0)] hover:border-[var(--dark3)] transition-colors"
-        >
-          Prompts
-        </a>
-      </nav>
+  <!-- Site index navigation -->
+  <nav aria-label="Site index" class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-xs">
+    <div class="flex items-center gap-4">
+      <a
+        routerLink="/"
+        routerLinkActive="bg-[var(--terminal-bright)] !text-black px-1.5 py-0.5 no-underline"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="underline underline-offset-4 text-[var(--terminal-base)] hover:text-[var(--terminal-bright)] transition-colors"
+      >
+        /dashboard
+      </a>
+      <a
+        routerLink="/prompts"
+        routerLinkActive="bg-[var(--terminal-bright)] !text-black px-1.5 py-0.5 no-underline"
+        class="underline underline-offset-4 text-[var(--terminal-base)] hover:text-[var(--terminal-bright)] transition-colors"
+      >
+        /prompts
+      </a>
     </div>
 
-    <!-- Indicador de conexión WebSocket & Dominio -->
-    <div class="flex items-center gap-3">
-      <div class="flex items-center gap-2 rounded-full bg-[var(--dark1)] px-3 py-1 text-xs font-medium border border-[var(--dark2)]">
-        @if (store.isWsConnected()) {
-          <span class="relative flex h-2 w-2">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--bright-green)] opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2 w-2 bg-[var(--bright-green)]"></span>
-          </span>
-          <span class="text-[var(--bright-green)]">En vivo</span>
-        } @else {
-          <span class="inline-flex rounded-full h-2 w-2 bg-[var(--bright-red)]"></span>
-          <span class="text-[var(--bright-red)]">Desconectado</span>
-        }
-      </div>
+    <!-- Indicador de conexión WebSocket estilo terminal -->
+    <div class="flex items-center gap-1.5 text-xs">
+      @if (store.isWsConnected()) {
+        <span class="text-[var(--terminal-success)]">●</span>
+        <span class="terminal-text-bright font-bold">EN_VIVO</span>
+      } @else {
+        <span class="text-[var(--terminal-error)]">○</span>
+        <span class="terminal-text-dim">DESCONECTADO</span>
+      }
     </div>
+  </nav>
+
+  <!-- Title & Description -->
+  <div class="flex flex-col gap-1 border-b border-[var(--terminal-border)] pb-4">
+    <h1 class="terminal-heading tracking-wider">
+      SHYT :: SUMMARY HUB YOUTUBE
+    </h1>
+    <p class="terminal-subheading">
+      # automatización de resúmenes con n8n, gemini llm y supadata
+    </p>
   </div>
 </header>

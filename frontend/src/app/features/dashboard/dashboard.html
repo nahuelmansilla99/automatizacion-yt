@@ -1,18 +1,15 @@
-<div class="space-y-6">
-  <!-- Fila Superior: Input de URL y Métricas de Supadata -->
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <div class="lg:col-span-2">
-      <app-url-input-card />
-    </div>
-    <div class="lg:col-span-1">
-      <app-supadata-metrics-card />
-    </div>
-  </div>
+<div class="w-full max-w-2xl mx-auto flex flex-col gap-10">
+  <!-- Sección: Nuevo Resumen -->
+  <app-url-input-card />
 
-  <!-- Fila Inferior: Tabla de Historial -->
+  <!-- Sección: Cuota de Métricas -->
+  <app-supadata-metrics-card />
+
+  <!-- Sección: Historial de Resúmenes -->
   <app-summary-table />
 
   <!-- Modales -->
   <app-summary-modal />
   <app-error-modal />
 </div>
+

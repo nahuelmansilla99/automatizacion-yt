@@ -1,83 +1,87 @@
-<div class="rounded-xl bg-[var(--background-primary)] p-5 sm:p-6">
-  <div class="flex items-center gap-2 mb-2">
-    <h2 class="text-base sm:text-lg font-bold text-[var(--bright-yellow)]">
-      Nuevo Resumen de YouTube
-    </h2>
-  </div>
+<section class="flex flex-col gap-3 font-mono">
+  <!-- Sección Header tipo terminal -->
+  <h2 class="terminal-divider text-xs sm:text-sm">
+    ── NUEVO_RESUMEN ────────────────────────────────────────────────────────────────
+  </h2>
 
-  <form (submit)="onSubmit($event)" class="flex flex-col gap-3">
+  <form (submit)="onSubmit($event)" class="flex flex-col gap-4 mt-1">
+    <!-- URL Input row -->
+    <div class="flex flex-col gap-2">
+      <div class="flex items-center gap-2 terminal-label">
+        <span class="text-[var(--terminal-bright)]">&gt;</span>
+        <span>url_video ............</span>
+      </div>
 
-    <!-- URL Input -->
-    <div class="flex flex-col sm:flex-row gap-3">
-      <div class="relative flex-1">
+      <div class="relative w-full">
         <input
           type="url"
           name="youtubeUrl"
           [(ngModel)]="url"
           (ngModelChange)="onUrlChange($event)"
-          placeholder="https://www.youtube.com/watch?v=... o https://youtu.be/..."
+          placeholder="https://www.youtube.com/watch?v=..."
           required
-          class="w-full rounded-lg bg-[var(--dark0-hard)] border border-[var(--dark2)] px-4 py-3 text-sm text-[var(--light0)] placeholder-[var(--dark4)] focus:border-[var(--bright-orange)] focus:outline-none transition-colors"
-          [class.border-[var(--bright-red)]]="hasError()"
+          class="terminal-input font-mono"
+          [class.border-[var(--terminal-error)]]="hasError()"
         />
         @if (url()) {
           <button
             type="button"
             (click)="clearUrl()"
-            class="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--light3)] hover:text-[var(--light0)] text-sm cursor-pointer"
+            class="absolute right-1 top-1/2 -translate-y-1/2 terminal-action-link px-1"
+            title="Limpiar URL"
           >
-            ✕
+            [ X ]
           </button>
         }
       </div>
-
-      <button
-        type="submit"
-        [disabled]="store.submitting() || !isValidUrl()"
-        class="inline-flex items-center justify-center gap-2 rounded-lg bg-[var(--bright-orange)] px-6 py-3 text-sm font-bold text-[var(--dark0-hard)] hover:brightness-110 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-all shadow-md"
-      >
-        @if (store.submitting()) {
-          <svg class="animate-spin h-4 w-4 text-[var(--dark0-hard)]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-          <span>Despachando...</span>
-        } @else {
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-          </svg>
-          <span>Generar Resumen</span>
-        }
-      </button>
     </div>
 
     <!-- Selector de Prompt -->
     @if (prompts().length > 0) {
-      <div class="flex items-center gap-3">
-        <span class="text-xs text-[var(--light3)] shrink-0 flex items-center gap-1">
-          Prompt seleccionado:
-        </span>
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2 terminal-label">
+          <span class="text-[var(--terminal-bright)]">&gt;</span>
+          <span>prompt_sistema .......</span>
+        </div>
+
         <select
           name="promptId"
           [ngModel]="selectedPromptId()"
           (ngModelChange)="selectedPromptId.set($event)"
-          class="flex-1 rounded-lg bg-[var(--dark0-hard)] border border-[var(--dark2)] px-3 py-1.5 text-xs text-[var(--light1)] focus:border-[var(--bright-orange)] focus:outline-none transition-colors cursor-pointer"
+          class="terminal-select"
         >
           @for (prompt of prompts(); track prompt.id) {
-            <option [value]="prompt.id">
-              {{ prompt.name }}{{ prompt.isDefault ? ' ⭐' : '' }}
-              @if (prompt.tags.length > 0) { · #{{ prompt.tags[0] }} }
+            <option [value]="prompt.id" class="bg-[var(--terminal-bg)] text-[var(--terminal-bright)]">
+              {{ prompt.name }}{{ prompt.isDefault ? ' [DEFAULT]' : '' }}
+              @if (prompt.tags.length > 0) { #{{ prompt.tags[0] }} }
             </option>
           }
         </select>
       </div>
     }
 
-  </form>
+    <!-- Submit Button & Feedback -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
+      <button
+        type="submit"
+        [disabled]="store.submitting() || !isValidUrl()"
+        class="terminal-btn-primary"
+      >
+        @if (store.submitting()) {
+          <span class="animate-spin text-sm">◴</span>
+          <span>[ DESPACHANDO... ]</span>
+        } @else {
+          <span>[ EJECUTAR_RESUMEN -&gt; ]</span>
+        }
+      </button>
 
-  @if (hasError()) {
-    <p class="mt-2 text-xs text-[var(--bright-red)] flex items-center gap-1">
-      <span>⚠</span> Por favor, ingresa una URL válida de YouTube (watch?v= o youtu.be).
-    </p>
-  }
-</div>
+      @if (hasError()) {
+        <p class="text-xs text-[var(--terminal-error)] flex items-center gap-1 uppercase">
+          <span>!</span> url inválida: ingrese formato watch?v= o youtu.be
+        </p>
+      }
+    </div>
+  </form>
+</section>
+
+
