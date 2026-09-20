@@ -79,9 +79,53 @@
       <!-- Contenido Markdown Renderizado -->
       <div class="flex-1 overflow-y-auto p-4 sm:p-6 select-text terminal-text">
         @if (summary.markdownContent) {
+          @if (frontmatter(); as meta) {
+            <div class="terminal-frontmatter-panel">
+              <div class="terminal-frontmatter-header">
+                <div class="terminal-frontmatter-title">
+                  <span>──</span>
+                  <span class="terminal-frontmatter-tag">[ METADATOS OBSIDIAN ]</span>
+                  <span class="terminal-frontmatter-rule">──────────────────────────────────────────────</span>
+                </div>
+                <span class="terminal-frontmatter-badge">[ PKM_NOTE ]</span>
+              </div>
+              <div class="terminal-frontmatter-grid">
+                @if (meta.fecha) {
+                  <div class="terminal-meta-item">
+                    <span class="terminal-meta-label">FECHA:</span>
+                    <span class="terminal-meta-value">{{ meta.fecha }}</span>
+                  </div>
+                }
+                @if (meta.canal) {
+                  <div class="terminal-meta-item">
+                    <span class="terminal-meta-label">CANAL:</span>
+                    <span class="terminal-meta-value">{{ meta.canal }}</span>
+                  </div>
+                }
+                @for (item of meta.otros; track item.key) {
+                  <div class="terminal-meta-item">
+                    <span class="terminal-meta-label">{{ item.key }}:</span>
+                    <span class="terminal-meta-value-base">{{ item.val }}</span>
+                  </div>
+                }
+                @if (meta.tags.length > 0) {
+                  <div class="terminal-meta-tags">
+                    <span class="terminal-meta-label">TAGS:</span>
+                    <div class="terminal-tags-list">
+                      @for (tag of meta.tags; track tag) {
+                        <span class="terminal-tag-badge">{{ tag.startsWith('#') ? tag : '#' + tag }}</span>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
           <div
             class="markdown-body leading-relaxed"
             [innerHTML]="renderedMarkdown()"
+            (click)="onMarkdownClick($event)"
           ></div>
         } @else {
           <div class="text-center py-12 terminal-text-dim uppercase">
