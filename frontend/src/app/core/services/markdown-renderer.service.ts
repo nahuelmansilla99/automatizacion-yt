@@ -156,9 +156,7 @@ export class MarkdownRendererService {
     if (depth === 1) {
       return `
 <div class="terminal-heading-1">
-  <div class="terminal-heading-rule">── [ DOCUMENTO ] ──────────────────────────────────────────────────────────────</div>
   <h1>${text}</h1>
-  <div class="terminal-heading-rule">──────────────────────────────────────────────────────────────────────────────</div>
 </div>`.trim();
     }
 
@@ -168,7 +166,6 @@ export class MarkdownRendererService {
   <h2>
     <span class="terminal-code-lines">──</span>
     <span>${text}</span>
-    <span class="terminal-code-rule">────────────────────────────────────────────────</span>
   </h2>
 </div>`.trim();
     }
@@ -250,7 +247,6 @@ export class MarkdownRendererService {
       <span>──</span>
       <span class="terminal-code-lang">[ ${this.escapeHtml(langDisplay)} ]</span>
       <span class="terminal-code-lines">[ ${lineLabel} ]</span>
-      <span class="terminal-code-rule">──────────────────────────────────────────────────────────────────</span>
     </div>
     <button
       type="button"

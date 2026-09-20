@@ -81,14 +81,6 @@
         @if (summary.markdownContent) {
           @if (frontmatter(); as meta) {
             <div class="terminal-frontmatter-panel">
-              <div class="terminal-frontmatter-header">
-                <div class="terminal-frontmatter-title">
-                  <span>──</span>
-                  <span class="terminal-frontmatter-tag">[ METADATOS OBSIDIAN ]</span>
-                  <span class="terminal-frontmatter-rule">──────────────────────────────────────────────</span>
-                </div>
-                <span class="terminal-frontmatter-badge">[ PKM_NOTE ]</span>
-              </div>
               <div class="terminal-frontmatter-grid">
                 @if (meta.fecha) {
                   <div class="terminal-meta-item">
