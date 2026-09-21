@@ -59,7 +59,7 @@ describe('SupadataMetricsCardComponent', () => {
     expect(component.usagePercent()).toBe(25);
     const el = fixture.nativeElement as HTMLElement;
     expect(el.textContent).toContain('25%');
-    expect(el.textContent).toContain('75 créditos');
+    expect(el.textContent).toContain('75 / 100 créditos');
   });
 
   it('debería mostrar mensaje informativo si no hay métricas configuradas', async () => {

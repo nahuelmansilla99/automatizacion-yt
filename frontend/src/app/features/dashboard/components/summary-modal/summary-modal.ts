@@ -1,10 +1,11 @@
 import { Component, inject, computed, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { marked } from 'marked';
 import { SummariesStore } from '../../store/summaries.store';
 import { ToastService } from '../../../../core/services/toast.service';
 import { SummaryApiService } from '../../../../core/services/summary-api.service';
+import { MarkdownRendererService } from '../../../../core/services/markdown-renderer.service';
 
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-summary-modal',
@@ -17,18 +18,54 @@ export class SummaryModalComponent {
   readonly store = inject(SummariesStore);
   readonly toast = inject(ToastService);
   readonly api = inject(SummaryApiService);
+  readonly markdownRenderer = inject(MarkdownRendererService);
+  private readonly sanitizer = inject(DomSanitizer);
 
   readonly copied = signal(false);
   readonly syncingDrive = signal(false);
 
-  readonly renderedMarkdown = computed(() => {
+  readonly parsedSummary = computed(() => {
     const raw = this.store.selectedSummary()?.markdownContent;
-    if (!raw) return '';
-    return marked.parse(raw);
+    if (!raw) {
+      return { meta: null, html: '' as SafeHtml };
+    }
+    const { meta, content } = this.markdownRenderer.extractFrontmatter(raw);
+    const html = this.sanitizer.bypassSecurityTrustHtml(this.markdownRenderer.render(content));
+    return { meta, html };
+  });
+
+  readonly renderedMarkdown = computed<SafeHtml>(() => {
+    return this.parsedSummary().html;
+  });
+
+  readonly frontmatter = computed(() => {
+    return this.parsedSummary().meta;
   });
 
   onBackdropClick(event: MouseEvent) {
     this.store.closeModal();
+  }
+
+  onMarkdownClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    const copyBtn = target.closest<HTMLElement>('.code-copy-btn');
+    if (!copyBtn) return;
+
+    const encodedCode = copyBtn.getAttribute('data-code');
+    if (!encodedCode) return;
+
+    const code = decodeURIComponent(encodedCode);
+    navigator.clipboard.writeText(code).then(() => {
+      const originalText = copyBtn.textContent;
+      copyBtn.textContent = '[ ✓ COPIADO ]';
+      copyBtn.classList.add('text-[var(--terminal-success)]');
+      this.toast.success('Fragmento de código copiado al portapapeles');
+
+      setTimeout(() => {
+        copyBtn.textContent = originalText || '[ COPIAR ]';
+        copyBtn.classList.remove('text-[var(--terminal-success)]');
+      }, 2000);
+    });
   }
 
   copyMarkdown() {

@@ -6,7 +6,7 @@ Plataforma integral para automatizar la extracción, transcripción y resumen de
 
 ## 🏛️ Arquitectura del Sistema
 
-* **Frontend:** Angular v21 (Standalone components, Signals, Reactive State Store, Tailwind CSS v4 con sistema de diseño Retro CRT Terminal en fósforo ámbar, tipografía Geist Mono SemiBold con text-shadow glow, scanlines calibradas, selector y administrador de prompts).
+* **Frontend:** Angular v21 (Standalone components, Signals, Reactive State Store, Tailwind CSS v4 con sistema de diseño **Retro CRT Terminal** en fósforo ámbar inspirado en Basement AI, tipografía Geist Mono SemiBold 600 con resplandor óptico `text-shadow` de pantalla de fósforo, capa global `crt-overlay` con scanlines calibradas y flicker a 60Hz, renderizador de notas Markdown con Marked + PrismJS, filosofía estricta de Cero Emojis con notación de corchetes de consola, y optimización de tablas y tarjetas con diseño responsive *Mobile-First*).
 * **Backend:** NestJS 11 (TypeORM con PostgreSQL, WebSockets con Socket.IO para notificaciones en vivo, validación estricta con class-validator).
   * **Pipeline Nativo:** Extracción vía YouTube oEmbed, transcripción vía Supadata Transcript API y síntesis con Google Gemini (`@google/genai`).
   * **Gestor de Prompts Dinámico:** Selección de plantillas personalizadas, tags, fallback a prompt predeterminado y congelamiento de snapshots inmutables por cada resumen.

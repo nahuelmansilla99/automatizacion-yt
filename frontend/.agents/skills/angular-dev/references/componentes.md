@@ -83,10 +83,26 @@ Angular usa bloques built-in para renderizado condicional e iteración:
 ### @switch
 
 ```html
+<!-- Enfoque Terminal: Glifos ASCII / Monocromáticos sin emojis -->
 @switch (estado()) {
-  @case ('PENDING') { <span>⏳ Procesando</span> }
-  @case ('SUCCESS') { <span>✅ Completado</span> }
-  @case ('ERROR')   { <span>❌ Error</span> }
+  @case ('PENDING') {
+    <span class="inline-flex items-center gap-1 font-mono text-[var(--terminal-bright)]">
+      <span class="animate-spin text-[var(--terminal-warn)]">◌</span>
+      <span>PROCESANDO</span>
+    </span>
+  }
+  @case ('SUCCESS') {
+    <span class="inline-flex items-center gap-1 font-mono font-bold text-[var(--terminal-bright)]">
+      <span class="text-[var(--terminal-success)]">●</span>
+      <span>COMPLETADO</span>
+    </span>
+  }
+  @case ('ERROR') {
+    <span class="inline-flex items-center gap-1 font-mono font-bold text-[var(--terminal-bright)]">
+      <span class="text-[var(--terminal-error)]">✕</span>
+      <span>ERROR</span>
+    </span>
+  }
 }
 ```
 
@@ -197,3 +213,5 @@ Angular encapsula los estilos de cada componente por defecto (ViewEncapsulation.
 5. **`track`** obligatorio en `@for` para performance
 6. **Importar** explícitamente las dependencias en `imports`
 7. **Separación de archivos y testing obligatorios**: Cada componente debe tener sus archivos `.ts`, `.html`, `.css` y su test `.spec.ts` en su respectiva carpeta. No incluir HTML ni CSS embebido/inline dentro del `.ts`.
+8. **Cero Emojis & Estética Terminal**: Prohibido el uso de emojis en los templates. Usar corchetes técnicos `[ ACCION ]`, glifos ASCII (`●`, `◌`, `✕`), y prefijos de comando (`>`, `::`, `-`).
+9. **Mobile-First en componentes de datos**: En listas o tablas, compactar indicadores de estado en pantallas pequeñas (< `sm`) colocando el circulito de estado directamente junto al título (`● TITULO`), omitiendo textos redundantes y usando flex-wrap para botones.
