@@ -51,19 +51,28 @@ mi-componente/
 src/app/
 ├── core/                    → Servicios singleton, lógica global
 │   ├── services/
+│   │   ├── summary-api.service.ts
+│   │   ├── prompt-api.service.ts
+│   │   ├── markdown-renderer.service.ts → Renderizador Marked + PrismJS terminal
 │   │   ├── websocket.service.ts     → Service de WebSocket
 │   │   └── toast.service.ts         → Service de notificaciones
 │   └── models/
-│       └── summary.model.ts         → Interfaces y tipos globales
+│       ├── summary.model.ts         → Interfaces y tipos de resúmenes
+│       └── prompt.model.ts          → Interfaces y tipos de prompts
 │
 ├── shared/                  → Componentes, pipes, directivas reutilizables
 │   └── components/
-│       ├── status-badge/
+│       ├── crt-overlay/             → Capa de efectos CRT (scanlines, flicker)
+│       │   ├── crt-overlay.ts
+│       │   ├── crt-overlay.html
+│       │   ├── crt-overlay.css
+│       │   └── crt-overlay.spec.ts
+│       ├── status-badge/            → Badges terminal [ ● ], [ ◌ ], [ ✕ ]
 │       │   ├── status-badge.ts
 │       │   ├── status-badge.html
 │       │   ├── status-badge.css
 │       │   └── status-badge.spec.ts
-│       ├── navbar/
+│       ├── navbar/                  → Barra de navegación terminal
 │       │   ├── navbar.ts
 │       │   ├── navbar.html
 │       │   ├── navbar.css
@@ -75,44 +84,34 @@ src/app/
 │           └── toast-container.spec.ts
 │
 ├── features/                → Módulos de negocio
-│   └── dashboard/
-│       ├── dashboard.ts             → Componente principal del feature
-│       ├── dashboard.html           → Template del dashboard
-│       ├── dashboard.css            → Estilos del dashboard
-│       ├── dashboard.spec.ts        → Test unitario del feature
-│       ├── components/              → Componentes específicos del feature
-│       │   ├── url-input-card/
-│       │   │   ├── url-input-card.ts
-│       │   │   ├── url-input-card.html
-│       │   │   ├── url-input-card.css
-│       │   │   └── url-input-card.spec.ts
-│       │   ├── supadata-metrics-card/
-│       │   │   ├── supadata-metrics-card.ts
-│       │   │   ├── supadata-metrics-card.html
-│       │   │   ├── supadata-metrics-card.css
-│       │   │   └── supadata-metrics-card.spec.ts
-│       │   ├── summary-table/
-│       │   │   ├── summary-table.ts
-│       │   │   ├── summary-table.html
-│       │   │   ├── summary-table.css
-│       │   │   └── summary-table.spec.ts
-│       │   ├── summary-modal/
-│       │   │   ├── summary-modal.ts
-│       │   │   ├── summary-modal.html
-│       │   │   ├── summary-modal.css
-│       │   │   └── summary-modal.spec.ts
-│       │   └── error-modal/
-│       │       ├── error-modal.ts
-│       │       ├── error-modal.html
-│       │       ├── error-modal.css
-│       │       └── error-modal.spec.ts
-│       └── store/
-│           └── summaries.store.ts   → Store local del feature
+│   ├── dashboard/           → Panel de control de resúmenes
+│   │   ├── dashboard.ts
+│   │   ├── dashboard.html
+│   │   ├── dashboard.css
+│   │   ├── dashboard.spec.ts
+│   │   ├── components/
+│   │   │   ├── url-input-card/
+│   │   │   ├── supadata-metrics-card/
+│   │   │   ├── summary-table/
+│   │   │   ├── summary-modal/
+│   │   │   └── error-modal/
+│   │   └── store/
+│   │       └── summaries.store.ts
+│   │
+│   └── prompts/             → Administrador de directivas Gemini
+│       ├── prompts.ts
+│       ├── prompts.html
+│       ├── prompts.css
+│       ├── prompts.spec.ts
+│       └── components/
+│           ├── prompt-list/
+│           ├── prompt-form-modal/
+│           └── prompt-detail-modal/
 │
 ├── app.routes.ts            → Rutas principales
 ├── app.config.ts            → Configuración de la app
 ├── app.ts                   → Componente raíz
-├── app.html                 → Template raíz
+├── app.html                 → Template raíz con app-crt-overlay
 └── app.css                  → Estilos raíz
 ```
 

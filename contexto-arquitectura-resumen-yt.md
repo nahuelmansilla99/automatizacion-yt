@@ -7,9 +7,9 @@
 
 ## 1. Descripción General del Proyecto
 
-El proyecto consiste en una plataforma web integral diseñada para automatizar la extracción, transcripción y resumen inteligente de videos de YouTube con Inteligencia Artificial. El resultado final se almacena en PostgreSQL para previsualización inmediata en el frontend (Angular) y, simultáneamente, se sincroniza como un archivo `.md` en Google Drive (para Obsidian) a través de un micro-worker opcional en n8n.
+El proyecto consiste en una plataforma web integral diseñada para automatizar la extracción, transcripción y resumen inteligente de videos de YouTube con Inteligencia Artificial. El resultado final se almacena en PostgreSQL para previsualización inmediata en el frontend (Angular con interfaz **Retro CRT Terminal** inspirada en Basement AI) y, simultáneamente, se sincroniza como un archivo `.md` en Google Drive (para Obsidian) a través de un micro-worker opcional en n8n.
 
-El sistema permite ingresar enlaces de YouTube, hacer un seguimiento asíncrono en tiempo real mediante WebSockets, visualizar el historial, auditar errores con trazabilidad exacta y consultar la cuota mensual de la API externa de transcripción (Supadata).
+El sistema permite ingresar enlaces de YouTube mediante una consola técnica, hacer un seguimiento asíncrono en tiempo real mediante WebSockets, visualizar el historial con diseño responsive mobile-first, auditar errores con trazabilidad exacta, explorar notas en Markdown con visor PrismJS integrado y consultar la cuota mensual de la API externa de transcripción (Supadata).
 
 ## 2. Infraestructura y Seguridad (Red)
 
@@ -20,11 +20,23 @@ El sistema permite ingresar enlaces de YouTube, hacer un seguimiento asíncrono 
 
 ## 3. Stack Tecnológico
 
-### Frontend: Angular
-*   **Dashboard:** Input de URL, selector dinámico de prompt, botón de ejecución y panel de métricas de Supadata.
+### Frontend: Angular (Interfaz Retro CRT Terminal)
+*   **Sistema de Diseño Retro CRT Terminal (Basement AI):**
+    *   Paleta monocromática en fósforo ámbar sobre fondo negro absoluto (`#000000`, `#ff4d00`, `#993000`, `#7a2200`, `#2a0e00`).
+    *   Tipografía técnica monoespaciada `Geist Mono` SemiBold (`600`) con resplandor óptico (`text-shadow: 0 0 6px rgba(255, 77, 0, 0.35)`).
+    *   Capa de monitor `app-crt-overlay` con simulación de líneas de barrido (scanlines) y flicker vertical a 60Hz.
+    *   Filosofía estricta de Cero Emojis en toda la UI, utilizando notación entre corchetes `[ ACCION ]` e indicadores de consola (`>`, `::`, `-`, `›`).
+*   **Dashboard Unificado:** Card de envío con estilo prompt de consola (`> INICIAR_RESUMEN`), selector dinámico de plantillas de prompts, panel de métricas de Supadata con display de cuota y botón de ejecución asíncrona.
+*   **Tabla de Historial & Responsividad Mobile-First:**
+    *   Listado de resúmenes con búsqueda en tiempo real, filtros por estado (`[ TODOS ]`, `[ COMPLETADOS ]`, `[ PROCESANDO ]`, `[ ERROR ]`).
+    *   En móvil (< `sm`), el indicador circular de estado se coloca inline al lado del título (`●`, `◌`, `✕`) prescindiendo de etiquetas de texto redundantes; en pantallas mayores (`sm+`) se conserva el guión y el badge completo.
+    *   Metadatos fluidos sin desbordamiento horizontal y acciones en `flex-wrap`.
+*   **Visor de Resúmenes Markdown (`MarkdownRendererService`):**
+    *   Procesamiento con Marked y PrismJS adaptado a la rampa de brillo de fósforo ámbar.
+    *   Bloques de código con cabecera de lenguaje, conteo de líneas, botón de copiado rápido y numeración monoespaciada.
+    *   Soporte para callouts estilizados de Obsidian (`.terminal-callout`) y panel de metadatos PKM / Frontmatter (`.terminal-frontmatter-panel`).
 *   **Gestor de Prompts (`/prompts`):** CRUD completo para crear, editar, etiquetar, previsualizar y definir el prompt predeterminado del sistema.
-*   **Tabla de Historial:** Muestra el título, canal, fecha, prompt utilizado, estado (`PENDING`, `SUCCESS`, `ERROR`) y modal/botón para "Ver Resumen" (renderizando el Markdown directamente de la BD).
-*   **Notificaciones en Tiempo Real:** WebSocket/SSE recibiendo cambios de estado (`summaryCreated`, `summaryUpdated`, `summaryError`, `summaryDeleted`).
+*   **Notificaciones en Tiempo Real:** WebSocket con Socket.IO para actualizar el estado del resumen en pantalla inmediatamente al cambiar (`summaryCreated`, `summaryUpdated`, `summaryError`, `summaryDeleted`).
 
 ### Backend: NestJS (Cerebro y Orquestador del Pipeline)
 *   **API REST & WebSockets:** Controladores para crear y consultar resúmenes (`/api/summaries`), gestionar prompts (`/api/prompts`); Gateway para emisión en tiempo real a clientes conectados.
