@@ -1,1 +1,116 @@
-/* URL input card specific styles */
+/* ============================================================
+   URL Input Block — bloque principal de ingreso de URL
+   ============================================================ */
+
+/* Contenedor con borde completo y padding */
+.url-input-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border: 1px solid var(--terminal-border);
+  padding: 0.75rem 1rem;
+  background-color: var(--terminal-bg-alt);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+/* Estado: URL válida */
+.url-input-block--valid {
+  border-color: var(--terminal-bright);
+  box-shadow: 0 0 0 1px var(--terminal-bright);
+}
+
+/* Estado: URL con error */
+.url-input-block--error {
+  border-color: var(--terminal-error);
+  box-shadow: 0 0 0 1px var(--terminal-error);
+}
+
+/* Label superior dentro del bloque */
+.url-input-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--terminal-dim);
+}
+
+.url-input-label__prefix {
+  color: var(--terminal-bright);
+  font-weight: 700;
+  font-size: 0.7rem;
+}
+
+.url-input-label__text {
+  letter-spacing: 0.15em;
+}
+
+/* Row input + botón limpiar */
+.url-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Campo de texto */
+.url-input-field {
+  flex: 1;
+  background-color: transparent;
+  border: none;
+  font-size: 0.75rem;
+  color: var(--terminal-bright);
+  font-family: inherit;
+  outline: none;
+  min-width: 0;
+}
+
+@media (min-width: 640px) {
+  .url-input-field {
+    font-size: 0.875rem;
+  }
+}
+
+.url-input-field::placeholder {
+  color: var(--terminal-dim);
+}
+
+/* Botón limpiar */
+.url-input-clear {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--terminal-dim);
+  font-family: inherit;
+  font-size: 0.7rem;
+  cursor: pointer;
+  padding: 0.1rem 0.25rem;
+  transition: color 150ms ease;
+}
+
+.url-input-clear:hover {
+  color: var(--terminal-error);
+}
+
+/* Texto de ayuda / feedback inline */
+.url-input-hint {
+  font-size: 0.6rem;
+  letter-spacing: 0.05em;
+  color: var(--terminal-dim);
+  text-transform: uppercase;
+  min-height: 1rem;
+}
+
+.url-input-hint--error {
+  color: var(--terminal-error);
+}
+
+.url-input-hint--ok {
+  color: var(--terminal-success);
+}
+
+/* Botón submit full-width */
+.terminal-btn-primary--full {
+  width: 100%;
+  justify-content: center;
+}

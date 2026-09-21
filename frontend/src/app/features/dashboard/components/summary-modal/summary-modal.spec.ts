@@ -70,7 +70,8 @@ describe('SummaryModalComponent', () => {
     const el = fixture.nativeElement as HTMLElement;
     expect(el.querySelector('.fixed')).toBeTruthy();
     expect(el.textContent).toContain('Video de Prueba');
-    expect(component.renderedMarkdown()).toContain('<h1>Resumen</h1>');
+    expect(el.querySelector('h1')?.textContent?.trim()).toBe('Resumen');
+    expect(el.innerHTML).toContain('terminal-heading-1');
   });
 
   it('debería cerrar el modal al invocar onBackdropClick', async () => {
@@ -86,5 +87,62 @@ describe('SummaryModalComponent', () => {
 
     // Assert
     expect(closeModalSpy).toHaveBeenCalled();
+  });
+
+  it('debería renderizar bloques de código con syntax highlighting y soportar onMarkdownClick para copiar', async () => {
+    const summaryWithCode: VideoSummary = {
+      ...mockSummary,
+      markdownContent: '```bash\nnpm install\n```',
+    };
+    selectedSummarySignal.set(summaryWithCode);
+    isModalOpenSignal.set(true);
+    await fixture.whenStable();
+
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.innerHTML).toContain('terminal-code-block');
+    expect(el.innerHTML).toContain('[ BASH ]');
+    expect(el.innerHTML).toContain('code-copy-btn');
+
+    // Test clipboard copy via onMarkdownClick
+    const writeTextSpy = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, {
+      clipboard: { writeText: writeTextSpy },
+    });
+
+    const fakeButton = document.createElement('button');
+    fakeButton.className = 'code-copy-btn';
+    fakeButton.setAttribute('data-code', encodeURIComponent('npm install'));
+    const fakeEvent = {
+      target: fakeButton,
+    } as unknown as MouseEvent;
+
+    component.onMarkdownClick(fakeEvent);
+    expect(writeTextSpy).toHaveBeenCalledWith('npm install');
+  });
+
+  it('debería renderizar el panel de metadatos de Obsidian en el template cuando el markdown tiene frontmatter', async () => {
+    const summaryWithFrontmatter: VideoSummary = {
+      ...mockSummary,
+      markdownContent: `---
+Fecha: 2026-09-20
+Canal: Canal Tech
+tags:
+  - "#ia"
+  - "#angular"
+---
+
+# Titulo Principal
+Contenido del resumen.`,
+    };
+    selectedSummarySignal.set(summaryWithFrontmatter);
+    isModalOpenSignal.set(true);
+    await fixture.whenStable();
+
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('.terminal-frontmatter-panel')).toBeTruthy();
+    expect(el.textContent).toContain('METADATOS OBSIDIAN');
+    expect(el.textContent).toContain('2026-09-20');
+    expect(el.textContent).toContain('#ia');
+    expect(el.textContent).toContain('#angular');
   });
 });

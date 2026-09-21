@@ -8,7 +8,6 @@
   --terminal-bg-alt:        #080808;
   --terminal-bright:        #ff4d00;
   --terminal-base:          #993000;
-  /* --terminal-base:          #cc4400; */
   --terminal-dim:           #7a2200; 
   --terminal-border:        #2a0e00;
 
@@ -16,6 +15,11 @@
   --terminal-warn:          #ffaa00;
   --terminal-error:         #ff3300;
   --terminal-info:          #0088cc;
+
+  /* Variables semánticas terminal con color-mix nativo (0 duplicados) */
+  --terminal-tag-bg:            color-mix(in srgb, var(--terminal-warn) 8%, transparent);
+  --terminal-callout-bg:        var(--terminal-bg-alt);
+  --terminal-code-btn-hover-bg: color-mix(in srgb, var(--terminal-bright) 8%, transparent);
 
   /* Aliases estilo basement */
   --machine-bg:             var(--terminal-bg);
@@ -582,72 +586,75 @@ body {
 .markdown-body h2,
 .markdown-body h3,
 .markdown-body h4 {
-  font-weight: 600;
+  font-family: inherit;
   margin-top: 1.5rem;
   margin-bottom: 0.75rem;
-  border-bottom: 1px solid var(--background-modifier-border);
-  padding-bottom: 0.3rem;
-}
-
-.markdown-body h1 {
-  color: var(--h1-color);
-  font-size: 1.75rem;
-}
-
-.markdown-body h2 {
-  color: var(--h2-color);
-  font-size: 1.4rem;
-}
-
-.markdown-body h3 {
-  color: var(--h3-color);
-  font-size: 1.15rem;
-}
-
-.markdown-body h4 {
-  color: var(--h4-color);
-  font-size: 1.05rem;
-}
-
-.markdown-body h5 {
-  color: var(--h5-color);
-}
-
-.markdown-body h6 {
-  color: var(--h6-color);
 }
 
 .markdown-body p {
   margin-top: 0.5rem;
   margin-bottom: 0.75rem;
+  line-height: 1.65;
 }
 
-.markdown-body ul,
+.markdown-body ul {
+  list-style: none;
+  padding-left: 0.25rem;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.markdown-body ul > li {
+  position: relative;
+  padding-left: 1.25rem;
+  margin-bottom: 0.4rem;
+  line-height: 1.6;
+}
+
+.markdown-body ul > li::before {
+  content: "›";
+  position: absolute;
+  left: 0.15rem;
+  top: 0;
+  color: var(--terminal-bright);
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
 .markdown-body ol {
   padding-left: 1.5rem;
   margin-bottom: 1rem;
 }
 
-.markdown-body li {
+.markdown-body ol > li {
   margin-bottom: 0.35rem;
+  line-height: 1.6;
+}
+
+.markdown-body ol > li::marker {
+  color: var(--terminal-dim);
+  font-family: monospace;
 }
 
 .markdown-body strong {
-  color: var(--bold-color);
-  font-weight: var(--bold-weight);
+  color: var(--terminal-bright);
+  font-weight: 700;
 }
 
 .markdown-body em {
-  color: var(--italic-color);
+  color: var(--light0-hard);
+  font-style: italic;
 }
 
 .markdown-body a {
-  color: var(--link-url);
-  text-decoration: var(--link-decoration);
+  color: var(--terminal-bright);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  transition: color 150ms ease;
 }
 
 .markdown-body a:hover {
-  text-decoration: underline;
+  color: var(--light0-hard);
 }
 
 .markdown-body mark {
@@ -682,21 +689,470 @@ body {
   color: var(--text-secondary);
 }
 
-.markdown-body blockquote {
-  border-left: 4px solid var(--color-aqua);
-  margin: 1rem 0;
-  padding-left: 1rem;
-  color: var(--text-muted);
-  background-color: rgba(var(--dark1_x), 0.4);
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
-  border-radius: 0 4px 4px 0;
+/* ==========================================================================
+   Terminal Code Block (Basement Style: Phosphor Syntax + ASCII Frames)
+   ========================================================================== */
+.terminal-code-block {
+  margin: 1.25rem 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
-.markdown-body hr {
-  border: 0;
-  border-top: 1px solid var(--background-modifier-border);
+.terminal-code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--terminal-bg);
+  border-top: 1px solid var(--terminal-border);
+  border-left: 1px solid var(--terminal-border);
+  border-right: 1px solid var(--terminal-border);
+  color: var(--terminal-dim);
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+}
+
+.terminal-code-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.terminal-code-lang {
+  color: var(--terminal-bright);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.terminal-code-lines {
+  color: var(--terminal-dim);
+}
+
+.terminal-code-rule {
+  color: var(--terminal-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.code-copy-btn {
+  background: transparent;
+  border: 1px solid var(--terminal-dim);
+  color: var(--terminal-base);
+  font-family: inherit;
+  font-size: 0.75rem;
+  padding: 0.125rem 0.5rem;
+  margin-left: 0.5rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 150ms ease;
+}
+
+.code-copy-btn:hover {
+  border-color: var(--terminal-bright);
+  color: var(--terminal-bright);
+  background: var(--terminal-code-btn-hover-bg);
+}
+
+.terminal-code-content {
+  position: relative;
+  max-height: 38rem;
+  max-height: calc(40 * 1.5rem + 1.5rem);
+  overflow-x: auto;
+  overflow-y: auto;
+  border-left: 1px solid var(--terminal-border);
+  border-right: 1px solid var(--terminal-border);
+  background: var(--terminal-bg-alt);
+  scrollbar-width: thin;
+  scrollbar-color: var(--terminal-dim) transparent;
+}
+
+.terminal-code-content::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.terminal-code-content::-webkit-scrollbar-thumb {
+  background: var(--terminal-dim);
+  border-radius: 3px;
+}
+
+.terminal-code-content::-webkit-scrollbar-thumb:hover {
+  background: var(--terminal-base);
+}
+
+.terminal-code-content .terminal-pre {
+  margin: 0 !important;
+  padding: 0.75rem 0.75rem 0.75rem 3.6rem !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  position: relative;
+  overflow: visible !important;
+  font-size: 0.85rem !important;
+  line-height: 1.5 !important;
+}
+
+.terminal-code-content .terminal-pre code {
+  background: transparent !important;
+  padding: 0 !important;
+  color: var(--terminal-base) !important;
+  font-family: inherit !important;
+  display: block;
+}
+
+/* Line numbers */
+.terminal-code-content .line-numbers-rows {
+  position: absolute;
+  pointer-events: none;
+  top: 0.75rem;
+  left: 0;
+  width: 2.8rem;
+  letter-spacing: -1px;
+  border-right: 1px solid var(--terminal-border);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.terminal-code-content .line-numbers-rows > span {
+  display: block;
+  counter-increment: linenumber;
+}
+
+.terminal-code-content .line-numbers-rows > span::before {
+  content: counter(linenumber);
+  color: var(--terminal-dim);
+  display: block;
+  padding-right: 0.6rem;
+  text-align: right;
+}
+
+.terminal-code-content .terminal-pre.line-numbers {
+  counter-reset: linenumber;
+}
+
+.terminal-code-footer {
+  display: flex;
+  align-items: center;
+  background: var(--terminal-bg);
+  border-bottom: 1px solid var(--terminal-border);
+  color: var(--terminal-dim);
+  padding: 0.125rem 0.75rem;
+  font-size: 0.75rem;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* Syntax Highlighting Tokens (Phosphor brightness ramp) */
+.terminal-code-block .token.comment,
+.terminal-code-block .token.prolog,
+.terminal-code-block .token.doctype,
+.terminal-code-block .token.cdata {
+  color: var(--terminal-dim);
+  font-style: italic;
+}
+
+.terminal-code-block .token.punctuation {
+  color: var(--terminal-dim);
+}
+
+.terminal-code-block .token.keyword,
+.terminal-code-block .token.tag,
+.terminal-code-block .token.operator {
+  color: var(--terminal-bright);
+  font-weight: 600;
+}
+
+.terminal-code-block .token.function,
+.terminal-code-block .token.class-name {
+  color: var(--light0-hard);
+}
+
+.terminal-code-block .token.string,
+.terminal-code-block .token.char,
+.terminal-code-block .token.attr-value {
+  color: var(--light0-soft);
+}
+
+.terminal-code-block .token.number,
+.terminal-code-block .token.boolean,
+.terminal-code-block .token.constant {
+  color: var(--terminal-warn);
+}
+
+.terminal-code-block .token.property,
+.terminal-code-block .token.variable,
+.terminal-code-block .token.parameter {
+  color: var(--terminal-base);
+}
+
+.terminal-code-block .token.url,
+.terminal-code-block .token.builtin {
+  color: var(--terminal-bright);
+}
+
+.terminal-code-block .token.regex,
+.terminal-code-block .token.important {
+  color: var(--terminal-error);
+}
+
+/* ==========================================================================
+   Terminal Callouts & Blockquotes (Obsidian Callouts / Terminal Frames)
+   ========================================================================== */
+.terminal-callout {
+  border-left: 3px solid var(--terminal-bright);
+  border-top: 1px solid var(--terminal-border);
+  border-right: 1px solid var(--terminal-border);
+  border-bottom: 1px solid var(--terminal-border);
+  background: var(--terminal-callout-bg);
+  border-radius: 0 4px 4px 0;
+  padding: 0.875rem 1rem;
+  margin: 1.25rem 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.8125rem;
+}
+
+.terminal-callout-abstract {
+  border-left-color: var(--terminal-bright);
+}
+
+.terminal-callout-info,
+.terminal-callout-note {
+  border-left-color: var(--terminal-info);
+}
+
+.terminal-callout-tip,
+.terminal-callout-success {
+  border-left-color: var(--terminal-success);
+}
+
+.terminal-callout-warning {
+  border-left-color: var(--terminal-warn);
+}
+
+.terminal-callout-danger,
+.terminal-callout-error {
+  border-left-color: var(--terminal-error);
+}
+
+.terminal-callout-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  color: var(--terminal-bright);
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.terminal-callout-body {
+  color: var(--terminal-base);
+  line-height: 1.6;
+}
+
+.terminal-callout-body p {
+  margin: 0.4rem 0;
+}
+
+.terminal-callout-body p:first-child {
+  margin-top: 0;
+}
+
+.terminal-callout-body p:last-child {
+  margin-bottom: 0;
+}
+
+.terminal-blockquote {
+  border-left: 3px solid var(--terminal-dim);
+  background: var(--terminal-bg-alt);
+  border-radius: 0 4px 4px 0;
+  color: var(--terminal-base);
+  padding: 0.5rem 1rem;
+  margin: 1rem 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* ==========================================================================
+   Terminal Frontmatter Panel (Obsidian PKM Notes)
+   ========================================================================== */
+.terminal-frontmatter-panel {
+  border: 1px solid var(--terminal-border);
+  background: var(--terminal-bg-alt);
+  padding: 0.875rem;
+  margin-bottom: 1.5rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.75rem;
+}
+
+.terminal-frontmatter-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--terminal-dim);
+  margin-bottom: 0.625rem;
+  user-select: none;
+}
+
+.terminal-frontmatter-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.terminal-frontmatter-tag {
+  color: var(--terminal-bright);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.terminal-frontmatter-rule {
+  color: var(--terminal-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.terminal-frontmatter-badge {
+  font-size: 0.625rem;
+  color: var(--terminal-dim);
+}
+
+.terminal-frontmatter-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem 1rem;
+}
+
+@media (min-width: 640px) {
+  .terminal-frontmatter-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.terminal-meta-item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.terminal-meta-label {
+  color: var(--terminal-dim);
+  font-weight: 600;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.terminal-meta-value {
+  color: var(--terminal-bright);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.terminal-meta-value-base {
+  color: var(--terminal-base);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.terminal-meta-tags {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem;
+  padding-top: 0.25rem;
+}
+
+.terminal-tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.terminal-tag-badge {
+  color: var(--terminal-warn);
+  background: var(--terminal-tag-bg);
+  padding: 0.125rem 0.375rem;
+  border-radius: 3px;
+  border: 1px solid var(--terminal-border);
+  font-family: inherit;
+  font-size: 0.75rem;
+}
+
+/* ==========================================================================
+   Terminal Headings & Dividers (Basement Style)
+   ========================================================================== */
+.terminal-heading-1 {
   margin: 1.5rem 0;
+}
+
+.terminal-heading-1 h1 {
+  color: var(--terminal-bright);
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: 1.35;
+  margin: 0.5rem 0;
+}
+
+.terminal-heading-rule {
+  color: var(--terminal-dim);
+  font-size: 0.75rem;
+  user-select: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.terminal-heading-2 {
+  margin-top: 1.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.terminal-heading-2 h2 {
+  color: var(--terminal-bright);
+  font-size: 1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.terminal-heading-3 {
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.terminal-heading-3 h3 {
+  color: var(--light0-hard);
+  font-size: 0.875rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.terminal-hr {
+  color: var(--terminal-dim);
+  margin: 1.5rem 0;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .markdown-body table {
@@ -767,7 +1223,6 @@ html, body {
   overflow: hidden;
   white-space: nowrap;
   color: var(--terminal-dim);
-  user-select: none;
 }
 
 /* ==========================================================================

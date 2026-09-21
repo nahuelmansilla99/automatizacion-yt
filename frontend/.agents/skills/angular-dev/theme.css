@@ -1,79 +1,164 @@
-:root
-{
-    --dark0-hard_x:     29,32,33; /* #1d2021 */
-    --dark0-hard:       rgb(var(--dark0-hard_x));
-    --dark0_x:          40,40,40; /* #282828 */
-    --dark0:            rgb(var(--dark0_x));
-    --dark0-soft_x:     50,48,47; /* #32302f */
-    --dark0-soft:       rgb(var(--dark0-soft_x));
-    --dark1_x:          60,56,54; /* #3c3836 */
-    --dark1:            rgb(var(--dark1_x));
-    --dark2_x:          80,73,69; /* #504945 */
-    --dark2:            rgb(var(--dark2_x));
-    --dark3_x:          102,92,84; /* #665c54 */
-    --dark3:            rgb(var(--dark3_x));
-    --dark4_x:          124,111,100; /* #7c6f64 */
-    --dark4:            rgb(var(--dark4_x));
-    --gray_x:           146,131,116; /* #928374 */
-    --gray:             rgb(var(--gray_x));
+:root {
+  /* ==========================================================================
+     Paleta Base: basement.studio / machine terminal
+     ========================================================================== */
+  --terminal-bg:            #000000;
+  --terminal-bg-alt:        #080808;
+  --terminal-bright:        #ff4d00;
+  --terminal-base:          #993000;
+  --terminal-dim:           #7a2200;
+  --terminal-border:        #2a0e00;
 
-    --light0-hard_x:    249,245,215; /* #f9f5d7 */
-    --light0-hard:      rgb(var(--light0-hard_x));
-    --light0_x:         251,241,199; /* #fbf1c7 */
-    --light0:           rgb(var(--light0_x));
-    --light0-soft_x:    242,229,188; /* #f2e5bc */
-    --light0-soft:      rgb(var(--light0-soft_x));
-    --light1_x:         235,219,178; /* #ebdbb2 */
-    --light1:           rgb(var(--light1_x));
-    --light2_x:         213,196,161; /* #d5c4a1 */
-    --light2:           rgb(var(--light2_x));
-    --light3_x:         189,174,147; /* #bdae93 */
-    --light3:           rgb(var(--light3_x));
-    --light4_x:         168,153,132; /* #a89984 */
-    --light4:           rgb(var(--light4_x));
+  --terminal-success:       #44bb00;
+  --terminal-warn:          #ffaa00;
+  --terminal-error:         #ff3300;
+  --terminal-info:          #0088cc;
 
-    --bright-red_x:     251,73,52; /* #fb4934 */
-    --bright-red:       rgb(var(--bright-red_x));
-    --bright-green_x:   184,187,38; /* #b8bb26 */
-    --bright-green:     rgb(var(--bright-green_x));
-    --bright-yellow_x:  250,189,47; /* #fabd2f */
-    --bright-yellow:    rgb(var(--bright-yellow_x));
-    --bright-blue_x:    131,165,152; /* #83a598 */
-    --bright-blue:      rgb(var(--bright-blue_x));
-    --bright-purple_x:  211,134,155; /* #d3869b */
-    --bright-purple:    rgb(var(--bright-purple_x));
-    --bright-aqua_x:    142,192,124; /* #8ec07c */
-    --bright-aqua:      rgb(var(--bright-aqua_x));
-    --bright-orange_x:  254,128,25; /* #fe8019 */
-    --bright-orange:    rgb(var(--bright-orange_x));
+  /* Variables semánticas terminal con color-mix nativo */
+  --terminal-tag-bg:            color-mix(in srgb, var(--terminal-warn) 8%, transparent);
+  --terminal-callout-bg:        var(--terminal-bg-alt);
+  --terminal-code-btn-hover-bg: color-mix(in srgb, var(--terminal-bright) 8%, transparent);
 
-    --neutral-red_x:    204,36,29; /* #cc241d */
-    --neutral-red:      rgb(var(--neutral-red_x));
-    --neutral-green_x:  152,151,26; /* #98971a */
-    --neutral-green:    rgb(var(--neutral-green_x));
-    --neutral-yellow_x: 215,153,33; /* #d79921 */
-    --neutral-yellow:   rgb(var(--neutral-yellow_x));
-    --neutral-yellow_x2: 233, 202, 113; /* #f9edd7 */
-    --neutral-yellow2:   rgb(var(--neutral-yellow_x2));
-    --neutral-blue_x:   69,133,136; /* #458588 */
-    --neutral-blue:     rgb(var(--neutral-blue_x));
-    --neutral-purple_x: 177,98,134; /* #b16286 */
-    --neutral-purple:   rgb(var(--neutral-purple_x));
-    --neutral-aqua_x:   104,157,106; /* #689d6a */
-    --neutral-aqua:     rgb(var(--neutral-aqua_x));
-    --neutral-orange_x: 214,93,14; /* #d65d0e */
-    --neutral-orange:   rgb(var(--neutral-orange_x));
+  /* Aliases estilo basement */
+  --machine-bg:             var(--terminal-bg);
+  --machine-base:           var(--terminal-base);
+  --machine-bright:         var(--terminal-bright);
+  --machine-dim:            var(--terminal-dim);
+  --machine-border:         var(--terminal-border);
+
+  /* Mapeo de compatibilidad hacia variables existentes */
+  --dark0-hard:             #000000;
+  --dark0-hard_x:           0, 0, 0;
+  --dark0:                  #050505;
+  --dark0_x:                5, 5, 5;
+  --dark0-soft:             #0a0a0a;
+  --dark0-soft_x:           10, 10, 10;
+  --dark1:                  #120600;
+  --dark1_x:                18, 6, 0;
+  --dark2:                  #2a0e00;
+  --dark2_x:                42, 14, 0;
+  --dark3:                  #441600;
+  --dark3_x:                68, 22, 0;
+  --dark4:                  #662200;
+  --dark4_x:                102, 34, 0;
+  --gray:                   #7a2200;
+  --gray_x:                 122, 34, 0;
+
+  --light0-hard:            #ff7711;
+  --light0-hard_x:          255, 119, 17;
+  --light0:                 #ff6600;
+  --light0_x:               255, 102, 0;
+  --light0-soft:            #ee5500;
+  --light0-soft_x:          238, 85, 0;
+  --light1:                 #cc4400;
+  --light1_x:               204, 68, 0;
+  --light2:                 #aa3300;
+  --light2_x:               170, 51, 0;
+  --light3:                 #7a2200;
+  --light3_x:               122, 34, 0;
+  --light4:                 #551600;
+  --light4_x:               85, 22, 0;
+
+  --bright-red:             #ff3300;
+  --bright-red_x:           255, 51, 0;
+  --bright-green:           #44bb00;
+  --bright-green_x:         68, 187, 0;
+  --bright-yellow:          #ffaa00;
+  --bright-yellow_x:        255, 170, 0;
+  --bright-blue:            #0088cc;
+  --bright-blue_x:          0, 136, 204;
+  --bright-purple:          #cc4400;
+  --bright-purple_x:        204, 68, 0;
+  --bright-aqua:            #ff7711;
+  --bright-aqua_x:          255, 119, 17;
+  --bright-orange:          #ff6600;
+  --bright-orange_x:        255, 102, 0;
+
+  --neutral-red:            #dd2200;
+  --neutral-red_x:          221, 34, 0;
+  --neutral-green:          #44bb00;
+  --neutral-green_x:        68, 187, 0;
+  --neutral-yellow:         #ffaa00;
+  --neutral-yellow_x:       255, 170, 0;
+  --neutral-yellow2:        #ff8800;
+  --neutral-yellow_x2:      255, 136, 0;
+  --neutral-blue:           #0088cc;
+  --neutral-blue_x:         0, 136, 204;
+  --neutral-purple:         #cc4400;
+  --neutral-purple_x:       204, 68, 0;
+  --neutral-aqua:           #ff7711;
+  --neutral-aqua_x:         255, 119, 17;
+  --neutral-orange:         #ff6600;
+  --neutral-orange_x:       255, 102, 0;
+
+  --faded-red:              #991100;
+  --faded-red_x:            153, 17, 0;
+  --faded-green:            #2e7d00;
+  --faded-green_x:          46, 125, 0;
+  --faded-yellow:           #996600;
+  --faded-yellow_x:         153, 102, 0;
+  --faded-blue:             #005580;
+  --faded-blue_x:           0, 85, 128;
+  --faded-purple:           #662200;
+  --faded-purple_x:         102, 34, 0;
+  --faded-aqua:             #883300;
+  --faded-aqua_x:           136, 51, 0;
+  --faded-orange:           #7a2200;
+  --faded-orange_x:         122, 34, 0;
+
+  /* Fondos y bordes semánticos */
+  --background-primary:           var(--terminal-bg);
+  --background-primary-alt:       var(--terminal-bg-alt);
+  --background-secondary:         var(--terminal-bg);
+  --background-secondary-alt:     var(--terminal-bg-alt);
+  --background-modifier-border:   var(--terminal-border);
+  --background-page:              var(--terminal-bg);
+
+  --bg-page:                      var(--terminal-bg);
+  --bg-primary:                   var(--terminal-bg);
+  --bg-primary-alt:               var(--terminal-bg-alt);
+  --bg-card:                      var(--terminal-bg);
+  --bg-card-hover:                var(--terminal-bg-alt);
+  --border-color:                 var(--terminal-border);
+  --border-subtle:                var(--terminal-border);
+
+  /* Textos semánticos */
+  --text-normal:                  var(--terminal-base);
+  --text-faint:                   var(--terminal-dim);
+  --text-muted:                   var(--terminal-dim);
+  --text-strong:                  var(--terminal-bright);
+  --text-secondary:               var(--terminal-dim);
+  --text-main:                    var(--terminal-base);
+  --text-body:                    var(--terminal-base);
+
+  --link-url:                     var(--terminal-bright);
+
+  /* Estados y Acentos semánticos */
+  --color-danger:                 var(--bright-red);
+  --color-success:                var(--bright-green);
+  --color-warning:                var(--bright-yellow);
+  --color-info:                   var(--bright-blue);
+  --accent-primary:               var(--terminal-bright);
+  --accent-aqua:                  var(--bright-aqua);
+  --accent-yellow:                var(--bright-yellow);
+  --accent-green:                 var(--bright-green);
+  --accent-red:                   var(--bright-red);
+  --accent-blue:                  var(--bright-blue);
+
+  /* Scrollbar Terminal */
+  --scrollbar-track:              var(--terminal-bg);
+  --scrollbar-thumb:              var(--terminal-border);
+  --scrollbar-thumb-hover:        var(--terminal-dim);
 }
 
-.theme-dark
-{
-    --background-primary:            var(--dark0);
-    --background-primary-alt:        var(--dark0);
-    --background-secondary:          var(--dark0-hard);
-    --background-secondary-alt:      var(--dark1);
-    --background-modifier-border:    var(--dark1);
+.theme-dark {
+  --background-primary:            var(--terminal-bg);
+  --background-primary-alt:        var(--terminal-bg-alt);
+  --background-secondary:          var(--terminal-bg);
+  --background-secondary-alt:      var(--terminal-bg-alt);
+  --background-modifier-border:    var(--terminal-border);
 
-    --text-normal:                   var(--light0);
-    --text-faint:                    var(--light1);
-    --text-muted:                    var(--light2);
+  --text-normal:                   var(--terminal-base);
+  --text-faint:                    var(--terminal-dim);
+  --text-muted:                    var(--terminal-dim);
 }

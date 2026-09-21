@@ -63,18 +63,18 @@ export class TiempoRelativoPipe implements PipeTransform {
 }
 ```
 
-### Pipe de Estado con Emoji
+### Pipe de Estado Terminal (ASCII / Glifos)
 
 ```ts
 @Pipe({ name: 'statusBadge' })
 export class StatusBadgePipe implements PipeTransform {
   transform(status: 'PENDING' | 'SUCCESS' | 'ERROR'): string {
     const badges: Record<string, string> = {
-      PENDING: '⏳ Procesando',
-      SUCCESS: '✅ Completado',
-      ERROR: '❌ Error',
+      PENDING: '[ ◌ PROCESANDO ]',
+      SUCCESS: '[ ● COMPLETADO ]',
+      ERROR: '[ ✕ ERROR ]',
     };
-    return badges[status] ?? status;
+    return badges[status] ?? `[ ${status} ]`;
   }
 }
 ```
