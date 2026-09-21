@@ -27,6 +27,7 @@ export class GeminiService {
     videoTitle: string,
     channelName: string,
     transcript: string,
+    youtubeUrl: string,
     systemInstruction: string,
   ): Promise<string> {
     if (!this.apiKey || !this.ai) {
