@@ -5,7 +5,28 @@
   </h2>
 
   <!-- Barra Superior: Filtros y Búsqueda estilo Terminal -->
-  <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
+  <div class="flex flex-col gap-3 text-xs">
+    <!-- Buscador Terminal -->
+    <div class="flex items-center gap-1 w-full border-b border-[var(--terminal-border)] pb-1">
+      <span class="terminal-label">&gt;</span>
+      <input
+        type="text"
+        [ngModel]="store.searchQuery()"
+        (ngModelChange)="store.setSearchQuery($event)"
+        placeholder="buscar..."
+        class="w-full bg-transparent text-xs text-[var(--terminal-bright)] placeholder-[var(--terminal-dim)] focus:outline-none font-mono uppercase"
+      />
+      @if (store.searchQuery()) {
+        <button
+          (click)="store.setSearchQuery('')"
+          class="terminal-action-link px-1"
+          title="Limpiar búsqueda"
+        >
+          [X]
+        </button>
+      }
+    </div>
+
     <!-- Píldoras/Links de Filtro de Estado -->
     <div class="flex flex-wrap items-center gap-1 sm:gap-2">
       <button
@@ -40,69 +61,61 @@
         [ ✕ ERROR({{ store.conError() }}) ]
       </button>
     </div>
-
-    <!-- Buscador Terminal -->
-    <div class="flex items-center gap-1 w-full md:w-64 border-b border-[var(--terminal-border)] pb-1">
-      <span class="terminal-label">&gt;</span>
-      <input
-        type="text"
-        [ngModel]="store.searchQuery()"
-        (ngModelChange)="store.setSearchQuery($event)"
-        placeholder="buscar..."
-        class="w-full bg-transparent text-xs text-[var(--terminal-bright)] placeholder-[var(--terminal-dim)] focus:outline-none font-mono uppercase"
-      />
-      @if (store.searchQuery()) {
-        <button
-          (click)="store.setSearchQuery('')"
-          class="terminal-action-link px-1"
-          title="Limpiar búsqueda"
-        >
-          [X]
-        </button>
-      }
-    </div>
   </div>
 
   <!-- Lista de Resúmenes estilo basement (Text list) -->
   <div class="mt-2 flex flex-col divide-y divide-[var(--terminal-border)] border-t border-b border-[var(--terminal-border)]">
     @for (video of store.filteredVideos(); track video.id) {
-      <div class="py-3 flex flex-col gap-2 hover:bg-[rgba(255,102,0,0.03)] transition-colors">
-        <!-- Fila superior: Título e hipervínculo -->
-        <div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
-          <div class="flex items-baseline gap-2 min-w-0">
-            <span class="terminal-text-bright shrink-0">-</span>
+      <div class="py-3 px-1 sm:px-0 flex flex-col gap-1.5 sm:gap-2 hover:bg-[rgba(255,102,0,0.03)] transition-colors">
+        <!-- Fila superior: Título con indicador de estado inline -->
+        <div class="flex items-baseline justify-between gap-2">
+          <div class="flex items-baseline gap-1.5 sm:gap-2 min-w-0">
+            <!-- Mobile: circulito de estado reemplaza el dash -->
+            @switch (video.status) {
+              @case ('SUCCESS') {
+                <span class="sm:hidden shrink-0 text-[var(--terminal-success)] text-xs">●</span>
+              }
+              @case ('PENDING') {
+                <span class="sm:hidden shrink-0 text-[var(--terminal-warn)] text-xs animate-spin">◌</span>
+              }
+              @case ('ERROR') {
+                <span class="sm:hidden shrink-0 text-[var(--terminal-error)] text-xs">✕</span>
+              }
+            }
+            <!-- Desktop: dash clásico -->
+            <span class="hidden sm:inline terminal-text-bright shrink-0">-</span>
             <span class="terminal-heading truncate text-xs sm:text-sm">
               {{ video.videoTitle || 'PROCESANDO_METADATA_VIDEO...' }}
             </span>
           </div>
 
-          <!-- Estado -->
-          <div class="shrink-0">
+          <!-- Estado completo: solo visible en sm+ -->
+          <div class="hidden sm:block shrink-0">
             <app-status-badge [status]="video.status" />
           </div>
         </div>
 
-        <!-- Fila intermedia: metadata -->
-        <div class="flex flex-wrap items-center gap-x-3 gap-y-1 terminal-text-dim pl-4">
+        <!-- Metadata -->
+        <div class="flex flex-wrap items-center gap-x-2 sm:gap-x-3 gap-y-1 terminal-text-dim pl-4 sm:pl-5 text-[10px] sm:text-xs">
           @if (video.channelName) {
             <span class="terminal-text uppercase">{{ video.channelName }}</span>
-            <span>::</span>
+            <span class="hidden sm:inline">::</span>
           }
           <span>{{ video.createdAt | date: 'yyyy-MM-dd HH:mm' }}</span>
-          <span>::</span>
+          <span class="hidden sm:inline">::</span>
           <a
             [href]="video.youtubeUrl"
             target="_blank"
             rel="noopener noreferrer"
-            class="text-[var(--terminal-dim)] hover:text-[var(--terminal-bright)] underline truncate max-w-xs"
+            class="text-[var(--terminal-dim)] hover:text-[var(--terminal-bright)] underline truncate max-w-[200px] sm:max-w-xs"
             title="Abrir URL original"
           >
             {{ video.youtubeUrl }}
           </a>
         </div>
 
-        <!-- Fila de acciones -->
-        <div class="flex items-center gap-2 pl-4 pt-1 text-xs">
+        <!-- Acciones -->
+        <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 pl-4 sm:pl-5 pt-0.5 sm:pt-1 text-[10px] sm:text-xs">
           @if (video.status === 'SUCCESS') {
             <button
               (click)="store.openModal(video)"
