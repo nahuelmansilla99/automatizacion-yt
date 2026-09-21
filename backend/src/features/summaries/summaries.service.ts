@@ -243,6 +243,7 @@ export class SummariesService {
         videoTitle,
         channelName,
         transcript,
+        youtubeUrl,
         prompt.content,
       );
 
@@ -258,6 +259,7 @@ export class SummariesService {
       summary.videoTitle = videoTitle;
       summary.channelName = channelName;
       summary.transcript = transcript;
+      summary.youtubeUrl = youtubeUrl;
       summary.markdownContent = markdownContent;
       summary.status = SummaryStatus.SUCCESS;
       summary.errorMessage = null;
